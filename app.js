@@ -66,9 +66,9 @@ window.addEventListener("load", function () {
           });
 
         p.draw = () => {
-          hands.forEach((h) => {
-            h.draw(p);
-          });
+          p.clear()
+            hand.draw(p);
+          
         };
 
         p.mouseClicked = () => {
@@ -104,7 +104,7 @@ window.addEventListener("load", function () {
           this.handpose.on('hand', results => {
             if (results.length > 0)
               console.log("HAND", results)
-
+              hand.update(results[0])
           });
         });
 
