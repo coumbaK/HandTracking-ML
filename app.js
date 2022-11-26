@@ -1,4 +1,4 @@
-/* globals Vector2D, allMasks, ml5, Vue, Face, p5 */
+/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5 */
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 300;
@@ -6,6 +6,7 @@ let p = undefined;
 
 const VIDEO_SRC = [
   //    https://www.lvlt.org/thequarantinemonologues
+  "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/signing.mp4?v=1669481781584",
   "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/youtuber.mp4?v=1668534362785",
   "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/monologs-2.mp4?v=1668546942642",
 ];
@@ -22,6 +23,7 @@ window.addEventListener("load", function () {
   // otherwise the Vector2d extention-of-arrays
   // and the Vue extension of datatypes will fight
   const face = new Face();
+  const hands = [new Hand(), new Hand()]
 
   new Vue({
     template: `<div id="app">
@@ -47,17 +49,11 @@ window.addEventListener("load", function () {
 		  
   </div>`,
     computed: {
-      selectedMask() {
-        return this.allMasks[this.selectedID];
-      },
+      
     },
 
     watch: {
-      selectedMask() {
-        console.log("SELECTED MASK", this.selectedID);
-        this.hasBeenSetup = false;
-        localStorage.setItem("lastMask", this.selectedID);
-      },
+      
     },
     mounted() {
       // Create P5 when we mount this element
@@ -74,11 +70,9 @@ window.addEventListener("load", function () {
           });
 
         p.draw = () => {
-          // face.drawDebug(p);
-          if (this.hasBeenSetup) this.selectedMask.draw(p, face);
-          else {
-            console.log("...waiting for face data")
-          }
+           hands.forEach(h => {
+             h.draw(p)
+           })
         };
 
         p.mouseClicked = () => {
@@ -97,7 +91,7 @@ window.addEventListener("load", function () {
       let video = this.$refs.video;
       video.addEventListener("loadeddata", (event) => {
         console.log("Loaded video data!");
-        this.startFaceDetection();
+        this.startFaceDetection()
       });
     },
 
@@ -107,8 +101,21 @@ window.addEventListener("load", function () {
         let video = this.$refs.video;
 
         face.predictionCount = 0;
+
+        this.handpose = ml5.handpose(video, () => {
+          console.log("hand model Loaded!");
+          // Listen to new 'hand' events
+          this.handpose.on('hand', results => {
+            if (results.length > 0)
+              console.log("HAND", results)
+            
+          });
+        });
+
+
         this.facemesh = ml5.facemesh(video, () => {
-          console.log("Model Loaded!");
+          console.log("face model Loaded!");
+
 
           // Listen to new 'face' events
           this.facemesh.on("face", (results) => {
@@ -126,25 +133,33 @@ window.addEventListener("load", function () {
             }
           });
         });
-        console.log(this.facemesh);
+        
       },
 
       switchInput() {
         console.log("toggle input", this.webcamMode);
+        
+        function setMLToUseWebcam() {
+            // Only change video when the video has loaded
+            this.facemesh.video =  this.webcam.elt;
+            this.webcamMode = true;
+        }
+        
         if (!this.webcamStarted) {
+          // Make a new video element to contain the webcam stream
+          // We can't just use an existing one because 
+          //   P5 makes it very easy to do but creates its own element
+          
           console.log("start new webcam stream");
           // Start the webcam stream
           this.webcam = p.createCapture(p.VIDEO, () => {
             this.webcamStarted = true;
-            // Only change video when the video has loaded
-            this.facemesh.video = camElt;
-            this.webcamMode = true;
+            setMLToUseWebcam()
           });
 
+          
           let camElt = this.webcam.elt;
-
           // Move the webcam element to the view
-          console.log(this);
           camElt.setAttribute("id", "webcam");
           camElt.setAttribute("class", "main-video");
           this.$refs.view.append(camElt);
@@ -158,8 +173,7 @@ window.addEventListener("load", function () {
             this.facemesh.video = this.$refs.video;
             // let el = document.getElementById("webcam")
           } else {
-            this.facemesh.video = this.webcam.elt;
-            this.webcamMode = true;
+            setMLToUseWebcam()
           }
         }
       },
