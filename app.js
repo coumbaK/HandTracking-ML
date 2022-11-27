@@ -11,6 +11,11 @@ const VIDEO_SRC = [
   "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/monologs-2.mp4?v=1668546942642",
 ];
 
+console.log("Create face and hands")
+const face = new Face();
+const hands = [new Hand(), new Hand()];
+
+
 window.addEventListener("load", function () {
   //------------------------------------------------------
   //------------------------------------------------------
@@ -22,8 +27,6 @@ window.addEventListener("load", function () {
   //   This has to stay outside of Vue,
   // otherwise the Vector2d extention-of-arrays
   // and the Vue extension of datatypes will fight
-  const face = new Face();
-  const hand = new Hand();
 
   new Vue({
     template: `<div id="app">
@@ -75,18 +78,20 @@ window.addEventListener("load", function () {
         p.draw = () => {
           p.clear();
 
-          p.push();
-          //move image by the width of image to the left
-          p.translate(this.webcam.width, 0);
-          //then scale it by -1 in the x-axis
-          //to flip the image
-          p.scale(-1, 1);
-          //draw video capture feed as image inside p5 canvas
-          p.image(this.webcam, 0, 0);
-          p.pop();
+          if (this.webcam) {
+            p.push();
+            //move image by the width of image to the left
+            p.translate(this.webcam.width, 0);
+            //then scale it by -1 in the x-axis
+            //to flip the image
+            p.scale(-1, 1);
+            //draw video capture feed as image inside p5 canvas
+            p.image(this.webcam, 0, 0);
+            p.pop();
+          }
 
           
-          hand.draw(p);
+          this.hands.forEach(h => h.draw(p));
           
           if (face.isActive)
             face.drawDebug(p);
@@ -108,10 +113,11 @@ window.addEventListener("load", function () {
       let video = this.$refs.video;
       video.addEventListener("loadeddata", (event) => {
         console.log("Loaded video data!");
-        this.startDetection();
+        // this.startDetection();
       });
+      initHandsFree()
 
-      this.switchInput();
+      // this.switchInput();
     },
 
     methods: {
