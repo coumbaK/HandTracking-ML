@@ -1,6 +1,7 @@
+/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands */
 
 
-function initHandsFree() {
+function initHandsFree(face, hands) {
 	console.log("Init handsfree")
 	let updateCount = 0
 	// From the handsfree demos (mostly)
@@ -27,46 +28,44 @@ function initHandsFree() {
 // 		console.log("track #", updateCount)
 
 		
-		// Only set position if visible
-		// Also smooth with the previous point
-		// pt.setToLerp((meshPt.x,meshPt.y), pt, app.smooth)
-		function setPoint(pt, meshPt) {
+// 		// Only set position if visible
+// 		// Also smooth with the previous point
+// 		// pt.setToLerp((meshPt.x,meshPt.y), pt, app.smooth)
+// 		function setPoint(pt, meshPt) {
 		
 			
-			let x = (.5 - meshPt.x)*canvasW
-			let y = (meshPt.y - .5)*canvasH
-			pt.setTo(x, y)
-			if (pt.index ===47)
-				console.log(pt.toFixed())
-			pt.visible = meshPt.visible
-		}
+// 			let x = (.5 - meshPt.x)*canvasW
+// 			let y = (meshPt.y - .5)*canvasH
+// 			pt.setTo(x, y)
+// 			if (pt.index ===47)
+// 				console.log(pt.toFixed())
+// 			pt.visible = meshPt.visible
+// 		}
     
 
 		// Set the points to the current mesh
 		if (data.facemesh &&  data.facemesh.multiFaceLandmarks &&  data.facemesh.multiFaceLandmarks.length > 0) {
-			let faceMesh = data.facemesh.multiFaceLandmarks[0]
-			console.log("update face")
+			let faceMeshData = data.facemesh.multiFaceLandmarks[0]
+			// console.log("update face")
 			// Copy over all of the face data
-			for (var i = 0; i < face.points.length; i++) {
-				setPoint(face.points[i], faceMesh[i])
-			}
+      // console.log(faceMeshData)
+      face.isActive = true
+      face.setTo(faceMeshData)
+      console.log(face.nose)
+     
+			// for (var i = 0; i < face.points.length; i++) {
+			// 	// setPoint(face.points[i], faceMesh[i])
+			// }
 		}
 
-		hands[0].visible = false
-		hands[1].visible = false
+		
 		if (data.hands.multiHandLandmarks && data.hands.multiHandLandmarks.length > 0) {
 			console.log("-- hands -- ")
-      data.hands.multiHandLandmarks[0].forEach()
-			for (var i = 0; i < hands[0].points.length; i++) {
-
-				setPoint(hand[0].points[i], data.hands.multiHandLandmarks[0][i])
-				hand[0].visible = true
-				if (data.hands.multiHandLandmarks[1]) {
-					hand[1].visible = true
-					setPoint(hand[1].points[i], data.hands.multiHandLandmarks[1][i])
-				}
-				
-			}
+      data.hands.multiHandLandmarks.forEach((handData, index) => {
+				// setPoint(hand[0].points[i], data.hands.multiHandLandmarks[0][i])
+				// hand[0].visible = true
+      })
+		
 		} else {
 			console.log("-- no hands -- ")
 		}

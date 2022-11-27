@@ -1,4 +1,4 @@
-/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5 */
+/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands */
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 500;
@@ -78,20 +78,20 @@ window.addEventListener("load", function () {
         p.draw = () => {
           p.clear();
 
-          if (this.webcam) {
-            p.push();
-            //move image by the width of image to the left
-            p.translate(this.webcam.width, 0);
-            //then scale it by -1 in the x-axis
-            //to flip the image
-            p.scale(-1, 1);
-            //draw video capture feed as image inside p5 canvas
-            p.image(this.webcam, 0, 0);
-            p.pop();
-          }
+          // if (this.webcam) {
+          //   p.push();
+          //   //move image by the width of image to the left
+          //   p.translate(this.webcam.width, 0);
+          //   //then scale it by -1 in the x-axis
+          //   //to flip the image
+          //   p.scale(-1, 1);
+          //   //draw video capture feed as image inside p5 canvas
+          //   p.image(this.webcam, 0, 0);
+          //   p.pop();
+          // }
 
           
-          this.hands.forEach(h => h.draw(p));
+          hands.forEach(h => h.draw(p));
           
           if (face.isActive)
             face.drawDebug(p);
@@ -115,7 +115,7 @@ window.addEventListener("load", function () {
         console.log("Loaded video data!");
         // this.startDetection();
       });
-      initHandsFree()
+      initHandsFree(face, hands)
 
       // this.switchInput();
     },

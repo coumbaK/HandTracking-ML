@@ -16,6 +16,8 @@ body {
 
 }
 
+
+
 header {
 	/* Make a top bar with a drop shadow, with horizontally-arranged items */
 	padding: 5px;
@@ -32,6 +34,10 @@ h1, h2, h3, h4 {
 
 button.active {
   background-color: hsla(100, 50%, 90%, 1);
+}
+
+.handsfree-video {
+  width: 300px;
 }
 
 video {

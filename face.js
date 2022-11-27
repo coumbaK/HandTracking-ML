@@ -1,6 +1,6 @@
 /* globals Vector2D, allMasks */
 
-let allMasks = {}
+let allMasks = {};
 
 /**
  * Class for Face
@@ -10,7 +10,6 @@ let allMasks = {}
  **/
 
 const FACE_INDICES = {
-  
   centerLine: [
     10, 151, 9, 8, 168, 6, 197, 195, 5, 4, 1, 19, 94, 2, 164, 0, 11, 12, 13, 14,
     15, 16, 17, 18, 200, 199, 175, 152,
@@ -115,18 +114,17 @@ const FACE_INDICES = {
       ],
     },
   ],
-
 };
 const LANDMARK_COUNT = 468;
 
 class Face {
   constructor() {
-    let predictionCount = -1
-    
+    let predictionCount = -1;
+
     //     All faces have 468 points
     this.points = [];
     for (var i = 0; i < LANDMARK_COUNT; i++) {
-      let pt = new Vector2D(Math.random()*400, Math.random()*400);
+      let pt = new Vector2D(Math.random() * 400, Math.random() * 400);
       pt.index = i;
       this.points[i] = pt;
     }
@@ -154,42 +152,41 @@ class Face {
       this.sides[i].eyeTop = this.sides[i].eye[4][4];
       this.sides[i].eyeBottom = this.sides[i].eye[4][12];
     }
-    
+
     // Non-side landmarks
-    this.mouth = contourListToVertices(FACE_INDICES.mouthRings)
-    this.centerLine = FACE_INDICES.centerLine.map((index) => this.points[index]);
-    this.top = this.centerLine[0]
-    this.bottom = this.centerLine[this.centerLine.length - 1]
-    this.nose = this.centerLine[9]
+    this.mouth = contourListToVertices(FACE_INDICES.mouthRings);
+    this.centerLine = FACE_INDICES.centerLine.map(
+      (index) => this.points[index]
+    );
+    this.top = this.centerLine[0];
+    this.bottom = this.centerLine[this.centerLine.length - 1];
+    this.nose = this.centerLine[9];
   }
 
-  setTo(prediction) {
-    this.predictionCount++
-    
+  setTo(predictedPts) {
+    this.predictionCount++;
+
     // console.log("set to prediction", prediction)
-    if (prediction) {
-      let predictedPts = prediction.scaledMesh;
+    if (predictedPts) {
       this.points.forEach((pt, index) => {
-        pt.setTo(predictedPts[index]);
+        let pt1 = predictedPts[index]
+        pt.setTo(pt1.x, pt1.y);
+      });
+      // Update various calculations
+      this.sides.forEach((side) => {
+        side.eyeCenter.setToLerp(side.eyeInner, side.eyeOuter, 0.5);
+        side.eyeWidth = side.eyeInner.getDistanceTo(side.eyeOuter);
+        side.eyeHeight = side.eyeTop.getDistanceTo(side.eyeBottom);
+        side.blink = side.eyeHeight / side.eyeWidth;
       });
     }
-
-    // Update various calculations
-    this.sides.forEach((side) => {
-      side.eyeCenter.setToLerp(side.eyeInner, side.eyeOuter, 0.5);
-      side.eyeWidth = side.eyeInner.getDistanceTo(side.eyeOuter);
-      side.eyeHeight = side.eyeTop.getDistanceTo(side.eyeBottom);
-      side.blink = side.eyeHeight / side.eyeWidth;
-    });
   }
 
   drawDebug(p) {
     this.points.forEach((pt) => {
-      p.circle(...pt, 4);
+      p.circle(...pt, 40);
       // p.text(pt.index, ...pt)
     });
-
-   
   }
 }
 
@@ -197,30 +194,26 @@ class Face {
 // Drawing utilities
 
 function drawRibbon(p, c0, c1, settings = {}) {
-   p.beginShape();
-  drawPoints(p, c0, {...settings, ...settings.side0})
-  drawPoints(p, c1, {...settings, ...settings.side1, reverse:true})
-  
-   p.endShape(settings.close ? p.CLOSE : undefined);
+  p.beginShape();
+  drawPoints(p, c0, { ...settings, ...settings.side0 });
+  drawPoints(p, c1, { ...settings, ...settings.side1, reverse: true });
+
+  p.endShape(settings.close ? p.CLOSE : undefined);
 }
 
 function drawContour(p, contour, settings = {}) {
   p.beginShape();
 
-  drawPoints(p, contour, settings)
+  drawPoints(p, contour, settings);
 
   // Close the path
   p.endShape(settings.close ? p.CLOSE : undefined);
 }
 
-
 function drawPoints(p, contour, settings = {}) {
-  
- 
   let temp = new Vector2D(0, 0);
   if (settings.reverse) {
-    
-    contour = contour.slice(0).reverse()
+    contour = contour.slice(0).reverse();
   }
 
   contour.forEach((pt, ptIndex) => {
@@ -246,14 +239,11 @@ function drawPoints(p, contour, settings = {}) {
 
     // // Double the last vertex for curves
     // if (settings.curve && ptIndex == contour.length - 1) p.curveVertex(...temp);
-    
+
     if (settings.curve) p.curveVertex(...temp);
     else p.vertex(...temp);
 
-    
     // Double the first vertex for curves
     // if (settings.curve && ptIndex == 0) p.curveVertex(...temp);
-
   });
-
 }
