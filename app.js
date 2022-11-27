@@ -27,12 +27,12 @@ window.addEventListener("load", function () {
 
   new Vue({
     template: `<div id="app">
+      
       <div id="controls">
-        <select v-model="selectedID">
-          <option v-for="maskID in Object.keys(allMasks)">{{maskID}}</option>
-        </select>
+       
         <button @click="switchInput">webcam</button>
-        {{webcamMode}}
+        
+        <tracking-recorder />
       </div>
 	    <div id="view" ref="view">
         
@@ -102,9 +102,10 @@ window.addEventListener("load", function () {
           console.log("hand model Loaded!");
           // Listen to new 'hand' events
           this.handpose.on('hand', results => {
-            if (results.length > 0)
+            if (results.length > 0) {
               console.log("HAND", results)
               hand.update(results[0])
+            }
           });
         });
 
