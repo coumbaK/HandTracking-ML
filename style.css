@@ -58,6 +58,8 @@ video {
 }
 
 #controls {
+  background-color: rgba(0, 0, 0, .4);
+  z-index: 100;
   overflow: scroll;
   top: 0px;
  position: absolute;
@@ -65,8 +67,12 @@ video {
 
 }
 
+button.active {
+  background-color: hsla(100, 100%, 50%, 1)
+}
+
 .row {
-  p
+  
   justify-content: space-around;
   display: flex;
   flex-direction: row;
