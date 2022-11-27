@@ -48,7 +48,15 @@ window.addEventListener("load", function () {
       
 		  
   </div>`,
-    computed: {},
+    computed: {
+       inactiveVideoElement() {
+          return  (!this.webcamMode)?this.webcam.elt:this.$refs.video
+       },
+      activeVideoElement() {
+       
+        return  this.webcamMode?this.webcam.elt:this.$refs.video
+      }
+    },
 
     watch: {},
     mounted() {
@@ -89,6 +97,8 @@ window.addEventListener("load", function () {
         console.log("Loaded video data!");
         this.startDetection();
       });
+      
+      this.switchInput()
     },
 
     methods: {
@@ -131,33 +141,46 @@ window.addEventListener("load", function () {
         //           });
         //
       },
+     
+      
+        setInputStream() {
+          // Only change video when the video has loaded
+          if (this.facemesh)
+            this.facemesh.video = this.activeVideoElement
+          if (this.handpose)
+            this.handpose.vide0 =  this.activeVideoElement
+          
+          this.activeVideoElement.style.display = "block"
+          this.inactiveVideoElement.style.display = "none"
+        },
+
 
       switchInput() {
         console.log("toggle input", this.webcamMode);
 
-        function setMLToUseWebcam() {
-          // Only change video when the video has loaded
-          this.facemesh.video = this.webcam.elt;
-          this.webcamMode = true;
-        }
-
+        
         if (!this.webcamStarted) {
           // Make a new video element to contain the webcam stream
           // We can't just use an existing one because
           //   P5 makes it very easy to do but creates its own element
 
           console.log("start new webcam stream");
+          
           // Start the webcam stream
           this.webcam = p.createCapture(p.VIDEO, () => {
             this.webcamStarted = true;
-            setMLToUseWebcam();
+            this.webcamMode = true
+            this.setInputStream()
           });
 
-          let camElt = this.webcam.elt;
+          
           // Move the webcam element to the view
+          // p5 puts its somewhere unhelpful by default
+          let camElt = this.webcam.elt;
           camElt.setAttribute("id", "webcam");
           camElt.setAttribute("class", "main-video");
           this.$refs.view.append(camElt);
+          
         } else {
           //           We already have the webcam, just toggle it
           if (this.webcamMode) {
@@ -168,7 +191,8 @@ window.addEventListener("load", function () {
             this.facemesh.video = this.$refs.video;
             // let el = document.getElementById("webcam")
           } else {
-            setMLToUseWebcam();
+           
+            
           }
         }
       },
