@@ -11,10 +11,9 @@ const VIDEO_SRC = [
   "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/monologs-2.mp4?v=1668546942642",
 ];
 
-console.log("Create face and hands")
+console.log("Create face and hands");
 const face = new Face();
 const hands = [new Hand(), new Hand()];
-
 
 window.addEventListener("load", function () {
   //------------------------------------------------------
@@ -41,7 +40,7 @@ window.addEventListener("load", function () {
         
         
         <!-- recorded video -->         
-        <video controls muted id="video" class="main-video" ref="video" crossorigin="anonymous" v-if="!webcamMode">
+        <video controls muted id="video" class="main-video" ref="video" crossorigin="anonymous" v-if="false">
           <source :src="sourceURL" type="video/mp4">
         </video>
         
@@ -90,11 +89,9 @@ window.addEventListener("load", function () {
           //   p.pop();
           // }
 
-          
-          hands.forEach(h => h.draw(p));
-          
-          if (face.isActive)
-            face.drawDebug(p);
+          hands.forEach((h) => h.draw(p));
+
+          if (face.isActive) face.drawDebug(p);
         };
 
         p.mouseClicked = () => {
@@ -111,11 +108,13 @@ window.addEventListener("load", function () {
 
       // When the video is loaded, start face detection
       let video = this.$refs.video;
-      video.addEventListener("loadeddata", (event) => {
-        console.log("Loaded video data!");
-        // this.startDetection();
-      });
-      initHandsFree(face, hands)
+      if (video)
+        video.addEventListener("loadeddata", (event) => {
+          console.log("Loaded video data!");
+          // this.startDetection();
+        });
+
+      initHandsFree(face, hands);
 
       // this.switchInput();
     },
@@ -134,34 +133,31 @@ window.addEventListener("load", function () {
             // New hand
             if (results.length > 0) {
               // console.log("HAND", results);
-              
+
               if (this.webcamMode) {
                 // Mirror all the points
                 // console.log(results[0].landmarks[0])
-                results[0].landmarks.forEach(pt => {
-                    pt[0] = this.webcam.width - pt[0]
-                })
+                results[0].landmarks.forEach((pt) => {
+                  pt[0] = this.webcam.width - pt[0];
+                });
               }
-              hand.isActive = true
+              hand.isActive = true;
               hand.update(results[0]);
             }
           });
         });
 
-//         // SETUP FACE TRACKING
-//         this.facemesh = ml5.facemesh(video, () => {
-//           console.log("face model Loaded!");
-              
+        //         // SETUP FACE TRACKING
+        //         this.facemesh = ml5.facemesh(video, () => {
+        //           console.log("face model Loaded!");
 
-//           // Listen to new 'face' events
-//           this.facemesh.on("face", (results) => {
-//        face.isActive = true
-//             // New face prediction!
-//             if (results.length > 0) face.setTo(results[0]);
-//           });
-//         });
-        
-        
+        //           // Listen to new 'face' events
+        //           this.facemesh.on("face", (results) => {
+        //        face.isActive = true
+        //             // New face prediction!
+        //             if (results.length > 0) face.setTo(results[0]);
+        //           });
+        //         });
       },
 
       setInputStream() {
@@ -187,7 +183,7 @@ window.addEventListener("load", function () {
 
           // Start the webcam stream
           this.webcam = p.createCapture(p.VIDEO, () => {
-            this.webcam.hide()
+            this.webcam.hide();
             this.webcamStarted = true;
             this.webcamMode = true;
             this.setInputStream();
@@ -225,7 +221,6 @@ window.addEventListener("load", function () {
 
         sourceURL: VIDEO_SRC[0],
         sources: VIDEO_SRC,
-
       };
     },
     el: "#app",

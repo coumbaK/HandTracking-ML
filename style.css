@@ -37,6 +37,26 @@ button.active {
 }
 
 .handsfree-video {
+/*   display: none; */
+  width: 300px;
+}
+
+.handsfree-debugger {
+  position: absolute;
+  left: 300px;
+  top: 0px;
+  transform: scale(-1, 1);
+  width: 300px;
+  height: 400px;
+  border: 2px solid magenta;
+}
+
+
+.handsfree-canvas {
+  z-index: 200;
+  top: 0px;
+  left: 0px;
+  position: absolute;
   width: 300px;
 }
 
