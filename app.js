@@ -1,7 +1,7 @@
 /* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5 */
 
 const CANVAS_WIDTH = 600;
-const CANVAS_HEIGHT = 300;
+const CANVAS_HEIGHT = 500;
 let p = undefined;
 
 const VIDEO_SRC = [
@@ -74,19 +74,22 @@ window.addEventListener("load", function () {
 
         p.draw = () => {
           p.clear();
-          
-          p.push()
-           //move image by the width of image to the left
- p.translate(this.webcam.width, 0);
-  //then scale it by -1 in the x-axis
-  //to flip the image
-  p.scale(-1, 1);
-  //draw video capture feed as image inside p5 canvas
-  p.image(this.webcam, 0, 0);
-          p.pop()
+
+          p.push();
+          //move image by the width of image to the left
+          p.translate(this.webcam.width, 0);
+          //then scale it by -1 in the x-axis
+          //to flip the image
+          p.scale(-1, 1);
+          //draw video capture feed as image inside p5 canvas
+          p.image(this.webcam, 0, 0);
+          p.pop();
+
           
           hand.draw(p);
-           face.drawDebug(p);
+          
+          if (face.isActive)
+            face.drawDebug(p);
         };
 
         p.mouseClicked = () => {
@@ -116,45 +119,54 @@ window.addEventListener("load", function () {
         console.log("STARTING FACE DETECTION ON VIDEO");
         let video = this.$refs.video;
 
-      
-
         // SETUP HAND TRACTING
         this.handpose = ml5.handpose(video, () => {
           console.log("hand model Loaded!");
-          
+
           // Listen to new 'hand' events
           this.handpose.on("hand", (results) => {
             // New hand
             if (results.length > 0) {
               // console.log("HAND", results);
+              
+              if (this.webcamMode) {
+                // Mirror all the points
+                // console.log(results[0].landmarks[0])
+                results[0].landmarks.forEach(pt => {
+                    pt[0] = this.webcam.width - pt[0]
+                })
+              }
+              hand.isActive = true
               hand.update(results[0]);
             }
           });
         });
 
-        // SETUP FACE TRACKING
-        this.facemesh = ml5.facemesh(video, () => {
-          console.log("face model Loaded!");
+//         // SETUP FACE TRACKING
+//         this.facemesh = ml5.facemesh(video, () => {
+//           console.log("face model Loaded!");
+              
 
-          // Listen to new 'face' events
-          this.facemesh.on("face", (results) => {
-            
-            // New face prediction!
-             if (results.length > 0)
-                face.setTo(results[0]);
-          });
-        });
+//           // Listen to new 'face' events
+//           this.facemesh.on("face", (results) => {
+//        face.isActive = true
+//             // New face prediction!
+//             if (results.length > 0) face.setTo(results[0]);
+//           });
+//         });
+        
+        
       },
 
       setInputStream() {
-        console.log("Set input stream:", this.webcamMode)
-        console.log("\tactive", this.activeVideoElement)
+        console.log("Set input stream:", this.webcamMode);
+        console.log("\tactive", this.activeVideoElement);
         // Only change video when the video has loaded
         if (this.facemesh) this.facemesh.video = this.activeVideoElement;
         if (this.handpose) this.handpose.video = this.activeVideoElement;
 
-        this.activeVideoElement.style.display = "block";
-        this.inactiveVideoElement.style.display = "none";
+        // this.activeVideoElement.style.display = "block";
+        // this.inactiveVideoElement.style.display = "none";
       },
 
       switchInput() {
@@ -169,6 +181,7 @@ window.addEventListener("load", function () {
 
           // Start the webcam stream
           this.webcam = p.createCapture(p.VIDEO, () => {
+            this.webcam.hide()
             this.webcamStarted = true;
             this.webcamMode = true;
             this.setInputStream();
@@ -181,15 +194,11 @@ window.addEventListener("load", function () {
           camElt.setAttribute("class", "main-video");
           this.$refs.view.append(camElt);
         } else {
-          
-          
-          
           //           We already have the webcam, just toggle it
           if (this.webcamMode) {
-//             console.log("Turn off webcam");
-//             this.webcam.stop();
-//             this.webcamMode = false;
-           
+            //             console.log("Turn off webcam");
+            //             this.webcam.stop();
+            //             this.webcamMode = false;
           } else {
           }
         }
@@ -211,7 +220,6 @@ window.addEventListener("load", function () {
         sourceURL: VIDEO_SRC[0],
         sources: VIDEO_SRC,
 
-        facePredictions: [],
       };
     },
     el: "#app",
