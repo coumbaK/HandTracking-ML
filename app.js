@@ -4,12 +4,12 @@ const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 400;
 let p = undefined;
 
-const VIDEO_SRC = [
-  //    https://www.lvlt.org/thequarantinemonologues
-  "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/signing.mp4?v=1669481781584",
-  "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/youtuber.mp4?v=1668534362785",
-  "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/monologs-2.mp4?v=1668546942642",
-];
+// const VIDEO_SRC = [
+//   //    https://www.lvlt.org/thequarantinemonologues
+//   "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/signing.mp4?v=1669481781584",
+//   "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/youtuber.mp4?v=1668534362785",
+//   "https://cdn.glitch.global/f422c25d-a910-4374-8c72-f41291b2b254/monologs-2.mp4?v=1668546942642",
+// ];
 
 console.log("Create face and hands");
 const face = new Face();
@@ -329,8 +329,8 @@ window.addEventListener("load", function () {
         playbackRec: recordings[0],
         playbackFrameCount: undefined,
 
-        classifierOptions: ["👍", "👎", "🖐", "👆", "🖖"],
-        selectedOption: "👍",
+        classifierOptions: ["🗡", "🛡", "🙃"],
+        selectedOption: "🗡",
 
         // Recording
         isRecording: true,
