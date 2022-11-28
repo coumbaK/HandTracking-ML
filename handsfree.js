@@ -1,5 +1,5 @@
 let handsfree = undefined;
-function initHandsFree({face, hands, p, onFrame, detectHands, detectFace}) {
+function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
   console.log("---- Init handsfree ----");
   let updateCount = 0;
 
@@ -10,19 +10,13 @@ function initHandsFree({face, hands, p, onFrame, detectHands, detectFace}) {
     facemesh: detectFace,
   });
 
- 
-
-  console.log(handsfree);
-
   // Let's create a plugin called "logger" to console.log the data
   handsfree.use("logger", (data) => {
-    
-    
     updateCount++;
 
     const el = document.getElementsByClassName("handsfree-debugger")[0];
 
-   document.getElementById("controls").appendChild(el)
+    document.getElementById("controls").appendChild(el);
     // console.log("EL", el)
     handsfree.aspectRatio = el.width / el.height;
     // console.log(handsfree.aspectRation)
@@ -67,12 +61,12 @@ function initHandsFree({face, hands, p, onFrame, detectHands, detectFace}) {
     } else {
       // console.log("-- no hands -- ")
     }
-    
-    onFrame()
+
+    onFrame();
   });
 
   // Start webcam and tracking (personally, I always like to ask first)
   handsfree.start();
-  console.log("STARTED HANDSFREE")
-  return handsfree
+  console.log("STARTED HANDSFREE");
+  return handsfree;
 }

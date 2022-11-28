@@ -36,6 +36,7 @@ window.addEventListener("load", function () {
         <button :class="{active:isRecording}" @click="toggleRecording">⏺</button>
       <button :class="{active:recordFace}" @click="recordFace=!recordFace">😐</button>
       <button :class="{active:recordHands}" @click="recordHands=!recordHands">🖐</button>
+      <div v-if="isRecording">Frames: {{currentRecording.length}}</div>
       
       <details>
         <summary>recordings</summary>
@@ -81,9 +82,9 @@ window.addEventListener("load", function () {
     },
     mounted() {
       // Listen for space bar
-      document.body.onkeyup = function (e) {
+      document.body.onkeyup =  (e) => {
         if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
-          this.isRecording = !this.isRecording;
+         this.toggleRecording()
         }
       };
 
@@ -127,6 +128,21 @@ window.addEventListener("load", function () {
                      detectFace: this.recordFace,
                      onFrame: () => {
         // A frame happened! Record it?
+                       if (this.isRecording) {
+                         console.log("record frame")
+                         
+// Do we have any data?
+                        
+                         let frame = {
+                          
+                         }
+                         if (this.recordFace)
+                           frame.face = face.toRecord()
+                          if (this.recordHands)
+                           frame.hands = hands.map(hand => hand.toRecord()) 
+                          this.currentRecording.push(frame)
+                         
+                       }
       }});
 
       
@@ -137,6 +153,9 @@ window.addEventListener("load", function () {
         this.isRecording = !this.isRecording
         if (this.isRecording) {
           console.log("START RECORDING")
+          
+          this.currentRecording = []
+          
         } else {
           console.log("STOP RECORDING")
         }
