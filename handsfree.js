@@ -15,11 +15,11 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
     updateCount++;
 
     const el = document.getElementsByClassName("handsfree-debugger")[0];
-    const videoEl = document.getElementById("handsfree-debugger");
+    const videoEl = document.getElementById("handsfree-canvas-video-1");
 
-    document.getElementById("controls").appendChild(el);
+    // document.getElementById("controls").appendChild(el);
     // console.log("EL", el)
-    handsfree.aspectRatio = el.width / el.height;
+    handsfree.aspectRatio = videoEl.width / videoEl.height;
     // console.log(handsfree.aspectRation)
 
     // I like to always bail if there's no data,
@@ -27,7 +27,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
     if (!data.hands) return;
 
     let xScale = handsfree.aspectRatio / (p.width / p.height);
-    console.log(xScale, handsfree.aspectRatio)
+    
     let settings = {
       aspectRatio: handsfree.aspectRatio,
       scale: p.width,

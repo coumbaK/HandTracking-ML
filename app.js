@@ -32,6 +32,12 @@ window.addEventListener("load", function () {
       
       <div id="controls">
          
+         <div>
+           <select v-for="rec in recordings">
+             <option val="rec">{{rec.labelDesc}}</option>
+           </select>
+         </div>
+         
          <div v-if="classifierOptions">
            <select>
              <option v-for="option in classifierOptions">{{option}}</option>
@@ -179,19 +185,30 @@ window.addEventListener("load", function () {
           console.log("START RECORDING");
 
           this.currentRecording = {
-            label: label,
+            label: this.label,
+            labelDesc: this.selectedOption,
+            timestamp: Date.now(),
             frames: [],
           };
         } else {
           console.log("STOP RECORDING");
           console.log(this.currentRecording);
+          this.recordings.push(this.currentRecording)
+          this.currentRecording = undefined
+          
+          let data =  JSON.stringify(this.recordings)
+          localStorage.setItem("recordings", data)
         }
       },
     },
 
     // We will use your data object as the data for Vue
     data() {
-      let recordings = localStorage.getItem("recordings") || [];
+      let data = localStorage.getItem("recordings")
+      let recordings = [];
+      if (data)
+        recordings = JSON.parse(data)
+      console.log("Loaded recordings", recordings)
       return {
         classifierOptions: ["👍", "👎", "🖐", "👆", "🖖"],
         selectedOption: "👍",

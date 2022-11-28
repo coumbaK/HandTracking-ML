@@ -39,7 +39,14 @@ class Trackable {
   }
 
   draw(p) {
-    this.points.forEach((pt) => p.circle(...pt, 20));
+     p.noStroke()
+    if (this.isActive) {
+     p.fill(100)
+    } else  {
+     p.fill(100, 0, 0, .1)
+    }
+      
+    this.points.forEach((pt) => p.circle(...pt, 4));
   }
 }
 
