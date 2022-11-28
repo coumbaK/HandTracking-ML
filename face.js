@@ -10,9 +10,14 @@ class Trackable {
   }
 
   fromRecord(record) {
+    
     if (record) {
       this.isActive = true;
-      this.points.forEach((pt1, index) => this.points[index].setTo(pt1));
+      record.forEach((pt1, index) => {
+        this.points[index].setTo(pt1);
+        // if (index == 10)
+          // console.log(pt1)
+      });
       this.postSet();
     } else this.isActive = false;
   }
@@ -31,20 +36,19 @@ class Trackable {
           settings.setPoint(pt, pt1);
         }
       });
-      
-      
+
       this.postSet();
     }
   }
 
   draw(p) {
-     p.noStroke()
+    p.noStroke();
     if (this.isActive) {
-     p.fill(100)
-    } else  {
-     p.fill(100, 0, 0, .1)
+      p.fill(100);
+    } else {
+      p.fill(100, 0, 0, 0.1);
     }
-      
+
     this.points.forEach((pt) => p.circle(...pt, 4));
   }
 }
@@ -176,8 +180,8 @@ const FACE_LANDMARK_COUNT = 468;
 
 class Face extends Trackable {
   constructor() {
-    super()
-   
+    super();
+
     //     All faces have 468 points
     for (var i = 0; i < FACE_LANDMARK_COUNT; i++) {
       let pt = new Vector2D(Math.random() * 400, Math.random() * 400);

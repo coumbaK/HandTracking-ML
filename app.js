@@ -136,12 +136,16 @@ window.addEventListener("load", function () {
 
           if (face.isActive) face.drawDebug(p);
           
-          if (this.playbackFrameCount) {
+          if (this.playbackFrameCount !== undefined) {
             console.log("PLAYBACK START", this.playbackFrameCount)
             this.playbackFrameCount += 1
-            let frame = this.playbackRec.frames[this.playbackFrameCount%this.playbackRec.frames]
-            console.log(frame)
-            this.hands.forEach((hand, handIndex) => hand.setToRecord(frame.hands[handIndex]))
+            let index = this.playbackFrameCount%this.playbackRec.frames.length
+            let frame = this.playbackRec.frames[index]
+           
+            
+            hands.forEach((hand, handIndex) => {
+              hand.fromRecord(frame.hands[handIndex])
+            })
           }
         };
 
@@ -192,14 +196,14 @@ window.addEventListener("load", function () {
       },
 
       togglePlayback() {
-        if (this.playbackStart) {
+        if (this.playbackFrameCount !== undefined) {
           console.log("Stop playback", this.playbackRec);
-          this.playbackStart = undefined;
+          this.playbackFrameCount = undefined;
             this.handsfree.unpause();
         } else {
          
           console.log("Start playback", this.playbackRec);
-          this.playbackFrameCount = Date.now();
+          this.playbackFrameCount = 0
           this.handsfree.pause();
           
         }
@@ -236,7 +240,7 @@ window.addEventListener("load", function () {
       console.log("Loaded recordings", recordings);
       return {
         playbackRec: recordings[0],
-        playbackFrameCount: 0,
+        playbackFrameCount: undefined,
 
         classifierOptions: ["👍", "👎", "🖐", "👆", "🖖"],
         selectedOption: "👍",
