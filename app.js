@@ -32,6 +32,11 @@ window.addEventListener("load", function () {
       
       <div id="controls">
          
+         <div v-if="classifierOptions">
+           <select>
+             <option v-for="option in classifierOptions">{{option}}</option>
+           </select>
+         </div>
          <div>
            <span class="label">label:</span><span class="value">{{label}}</span>
          </div>
@@ -64,6 +69,17 @@ window.addEventListener("load", function () {
       },
       activeVideoElement() {
         return this.webcamMode ? this.webcam.elt : this.$refs.video;
+      },
+
+      label() {
+        if (this.classifierOptions) {
+          // The label is a one-hot of the classifier
+          let label = new Array(this.classifierOptions.length).fill(0);
+          let index = this.classifierOptions.indexOf(this.selectedOption);
+          console.log(index, this.selectedOption, this.classifierOptions)
+          label[index] = 1;
+          return label;
+        }
       },
     },
 
@@ -143,21 +159,20 @@ window.addEventListener("load", function () {
             if (this.recordHands)
               frame.hands = hands.map((hand) => hand.toRecord());
             this.currentRecording.frames.push(frame);
-            
-            
           }
         },
       });
     },
 
     methods: {
-      
       setToRecordFrame(frame) {
         if (frame.hands) {
-          this.hands.forEach((hand, hIndex) => hand.setToRecord(frame.hands[hIndex]))
+          this.hands.forEach((hand, hIndex) =>
+            hand.setToRecord(frame.hands[hIndex])
+          );
         }
       },
-      
+
       toggleRecording() {
         this.isRecording = !this.isRecording;
         if (this.isRecording) {
@@ -165,21 +180,22 @@ window.addEventListener("load", function () {
 
           this.currentRecording = {
             label: label,
-            frames: []
+            frames: [],
           };
         } else {
           console.log("STOP RECORDING");
-          console.log(this.currentRecording)
+          console.log(this.currentRecording);
         }
       },
     },
 
     // We will use your data object as the data for Vue
     data() {
-     let recordings = localStorage.getItem("recordings") || []
+      let recordings = localStorage.getItem("recordings") || [];
       return {
         classifierOptions: ["👍", "👎", "🖐", "👆", "🖖"],
-        label: [0, 0, 1],
+        selectedOption: "👍",
+
         // Recording
         isRecording: true,
         recordHands: true,

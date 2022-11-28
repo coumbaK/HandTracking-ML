@@ -15,6 +15,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
     updateCount++;
 
     const el = document.getElementsByClassName("handsfree-debugger")[0];
+    const videoEl = document.getElementById("handsfree-debugger");
 
     document.getElementById("controls").appendChild(el);
     // console.log("EL", el)
@@ -26,7 +27,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
     if (!data.hands) return;
 
     let xScale = handsfree.aspectRatio / (p.width / p.height);
-
+    console.log(xScale, handsfree.aspectRatio)
     let settings = {
       aspectRatio: handsfree.aspectRatio,
       scale: p.width,
