@@ -46,7 +46,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
       // console.log("update face")
       // Copy over all of the face data
       // console.log(faceMeshData)
-      face.isActive = true;
+      
       face.setTo(faceMeshData, settings);
     }
 

@@ -33,9 +33,10 @@ window.addEventListener("load", function () {
       <div id="controls">
          
          <div>
-           <select v-for="rec in recordings">
-             <option val="rec">{{rec.labelDesc}}</option>
+           <select v-model="playbackRec">
+             <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toString()}}</option>
            </select>
+           <button @click="togglePlayback">▶️</button> 
          </div>
          
          <div v-if="classifierOptions">
@@ -82,7 +83,7 @@ window.addEventListener("load", function () {
           // The label is a one-hot of the classifier
           let label = new Array(this.classifierOptions.length).fill(0);
           let index = this.classifierOptions.indexOf(this.selectedOption);
-          console.log(index, this.selectedOption, this.classifierOptions)
+          console.log(index, this.selectedOption, this.classifierOptions);
           label[index] = 1;
           return label;
         }
@@ -90,6 +91,9 @@ window.addEventListener("load", function () {
     },
 
     watch: {
+      playbackRec() {
+        console.log("playbackRec", this.playbackRec);
+      },
       recordFace() {
         this.handsfree.update({
           facemesh: this.recordFace,
@@ -131,6 +135,14 @@ window.addEventListener("load", function () {
           hands.forEach((h) => h.draw(p));
 
           if (face.isActive) face.drawDebug(p);
+          
+          if (this.playbackFrameCount) {
+            console.log("PLAYBACK START", this.playbackFrameCount)
+            this.playbackFrameCount += 1
+            let frame = this.playbackRec.frames[this.playbackFrameCount%this.playbackRec.frames]
+            console.log(frame)
+            this.hands.forEach((hand, handIndex) => hand.setToRecord(frame.hands[handIndex]))
+          }
         };
 
         p.mouseClicked = () => {
@@ -179,6 +191,20 @@ window.addEventListener("load", function () {
         }
       },
 
+      togglePlayback() {
+        if (this.playbackStart) {
+          console.log("Stop playback", this.playbackRec);
+          this.playbackStart = undefined;
+            this.handsfree.unpause();
+        } else {
+         
+          console.log("Start playback", this.playbackRec);
+          this.playbackFrameCount = Date.now();
+          this.handsfree.pause();
+          
+        }
+      },
+
       toggleRecording() {
         this.isRecording = !this.isRecording;
         if (this.isRecording) {
@@ -193,23 +219,25 @@ window.addEventListener("load", function () {
         } else {
           console.log("STOP RECORDING");
           console.log(this.currentRecording);
-          this.recordings.push(this.currentRecording)
-          this.currentRecording = undefined
-          
-          let data =  JSON.stringify(this.recordings)
-          localStorage.setItem("recordings", data)
+          this.recordings.push(this.currentRecording);
+          this.currentRecording = undefined;
+
+          let data = JSON.stringify(this.recordings);
+          localStorage.setItem("recordings", data);
         }
       },
     },
 
     // We will use your data object as the data for Vue
     data() {
-      let data = localStorage.getItem("recordings")
+      let data = localStorage.getItem("recordings");
       let recordings = [];
-      if (data)
-        recordings = JSON.parse(data)
-      console.log("Loaded recordings", recordings)
+      if (data) recordings = JSON.parse(data);
+      console.log("Loaded recordings", recordings);
       return {
+        playbackRec: recordings[0],
+        playbackFrameCount: 0,
+
         classifierOptions: ["👍", "👎", "🖐", "👆", "🖖"],
         selectedOption: "👍",
 

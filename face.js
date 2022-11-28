@@ -20,7 +20,6 @@ class Trackable {
   postSet() {}
 
   setTo(predictedPts, settings) {
-    console.log("set to predicted", predictedPts)
     if (predictedPts === undefined) {
       // No hand data
       this.isActive = false;
