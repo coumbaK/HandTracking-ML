@@ -5,6 +5,7 @@ const CANVAS_HEIGHT = 400;
 let p = undefined;
 
 
+
 const VIDEO_SRC = [
   //    https://www.lvlt.org/thequarantinemonologues
   "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/signing.mp4?v=1669481781584",
@@ -62,6 +63,17 @@ window.addEventListener("load", function () {
 
     watch: {},
     mounted() {
+      // Listen for space bar
+      document.body.onkeyup = function(e) {
+        if (e.key == " " ||
+            e.code == "Space" ||      
+            e.keyCode == 32      
+        ) {
+            this.isRecording = !this.isRecording
+        }
+      }
+      
+      
       // Create P5 when we mount this element
       const s = (p0) => {
         p = p0;
@@ -214,6 +226,10 @@ window.addEventListener("load", function () {
       let lastID = localStorage.getItem("lastMask");
       if (!allMasks[lastID]) lastID = Object.keys(allMasks)[0];
       return {
+        
+        // Recording
+        isRecording: true,
+        
         hasBeenSetup: false,
 
         webcamMode: false,

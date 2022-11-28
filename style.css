@@ -38,27 +38,26 @@ button.active {
 
 
 .handsfree-video {
-/*   display: none; */
+  display: none;
 }
 
 .handsfree-video, .handsfree-canvas  {
 /*   display: none; */
-
+position: absolute;
     z-index: 200;
   top: 0px;
   left: 0px;
-  position: absolute;
-  width: 300px;
+ 
+  width: 200px;
 }
 
 .handsfree-debugger {
+/*   display: none; */
   position: absolute;
-  left: 300px;
   top: 0px;
+  right: 0px;
   transform: scale(-1, 1);
-  width: 300px;
-  height: 400px;
-  border: 2px solid magenta;
+
 }
 
 
@@ -88,9 +87,11 @@ video {
 }
 
 #controls {
+  width: 300px;
+  height: 100px;
   background-color: rgba(0, 0, 0, .4);
   z-index: 100;
-  overflow: scroll;
+  
   top: 0px;
  position: absolute;
   flex: 1;

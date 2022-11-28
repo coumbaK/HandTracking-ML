@@ -19,9 +19,12 @@ function initHandsFree(face, hands, p) {
 
   // Let's create a plugin called "logger" to console.log the data
   handsfree.use("logger", (data) => {
+    
     updateCount++;
 
-    const el = document.getElementById("handsfree-canvas-video-1");
+    const el = document.getElementsByClassName("handsfree-debugger")[0];
+
+   document.getElementById("controls").appendChild(el)
     // console.log("EL", el)
     handsfree.aspectRatio = el.width / el.height;
     // console.log(handsfree.aspectRation)
