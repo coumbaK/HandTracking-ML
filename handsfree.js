@@ -1,24 +1,22 @@
 let handsfree = undefined;
-function initHandsFree(face, hands, p) {
+function initHandsFree({face, hands, p, onFrame, detectHands, detectFace}) {
   console.log("---- Init handsfree ----");
   let updateCount = 0;
 
   // From the handsfree demos (mostly)
   let handsfree = new Handsfree({
     showDebug: true,
-    hands: true,
-    facemesh: true,
+    hands: detectHands,
+    facemesh: detectFace,
   });
 
-  // handsfree.update({
-  //   facemesh: false,
-  //   hands: false,
-  // });
+ 
 
   console.log(handsfree);
 
   // Let's create a plugin called "logger" to console.log the data
   handsfree.use("logger", (data) => {
+    
     
     updateCount++;
 
@@ -69,8 +67,12 @@ function initHandsFree(face, hands, p) {
     } else {
       // console.log("-- no hands -- ")
     }
+    
+    onFrame()
   });
 
   // Start webcam and tracking (personally, I always like to ask first)
   handsfree.start();
+  console.log("STARTED HANDSFREE")
+  return handsfree
 }
