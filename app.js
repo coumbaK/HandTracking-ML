@@ -136,17 +136,17 @@ window.addEventListener("load", function () {
           hands.forEach((h) => h.draw(p));
 
           if (face.isActive) face.drawDebug(p);
-          
+
           if (this.playbackFrameCount !== undefined) {
-            console.log("PLAYBACK START", this.playbackFrameCount)
-            this.playbackFrameCount += 1
-            let index = this.playbackFrameCount%this.playbackRec.frames.length
-            let frame = this.playbackRec.frames[index]
-           
-            
+            console.log("PLAYBACK START", this.playbackFrameCount);
+            this.playbackFrameCount += 1;
+            let index =
+              this.playbackFrameCount % this.playbackRec.frames.length;
+            let frame = this.playbackRec.frames[index];
+
             hands.forEach((hand, handIndex) => {
-              hand.fromRecord(frame.hands[handIndex])
-            })
+              hand.fromRecord(frame.hands[handIndex]);
+            });
           }
         };
 
@@ -179,44 +179,60 @@ window.addEventListener("load", function () {
 
             let frame = {};
             if (this.recordFace) frame.face = face.toRecord();
-            if (this.recordHands)
-              frame.hands = hands.map((hand) => hand.toRecord());
+            if (this.recordHands) {
+              frame.hands = [];
+              hands.forEach((hand) => {
+                if (hand.isActive) frame.hands.push(hand.toRecord());
+              });
+            }
+
             this.currentRecording.frames.push(frame);
           }
         },
       });
-      
-      this.train()
+
+      this.train();
     },
 
     methods: {
-      
       train() {
-        console.log("TRAIN")
+        console.log("TRAIN");
         this.nn = ml5.neuralNetwork({
-  task: 'classification',
-           inputs: HAND_LANDMARK_COUNT*2,
-           outputs: this.classifierOptions.length,
-  debug: true
-});
-        
-        this.recordings.forEach(rec => {
-          console.log(rec.label)
-          rec.frames.forEach(rec => )
-  // const inputs = {
-  //   r: item.r, 
-  //   g: item.g, 
-  //   b: item.b
-  // };
-  // const output = {
-  //   color: item.color
-  // };
+          task: "classification",
+          inputs: HAND_LANDMARK_COUNT * 2,
+          outputs: this.classifierOptions.length,
+          outputLabels: this.classifierOptions,
+          debug: true,
+        });
 
-  // nn.addData(inputs, output);
-});
+        this.recordings.forEach((rec) => {
+          console.log(rec.label);
+          rec.frames.forEach((frame) => {
+            console.log(frame.hands.length);
 
+            // Add this hand as a labeled data
+            frame.hands.forEach((hand) => {
+              console.log(hand.flat().length);
+              const inputs = hand.flat();
+              const outputs = rec.label;
+              console.log(inputs, outputs);
+
+              this.nn.addData(inputs, outputs);
+            });
+          });
+        });
+        this.nn.normalizeData();
+
+        // Step 6: train your neural network
+        const trainingOptions = {
+          epochs: 32,
+          batchSize: 12,
+        };
+        this.nn.train(trainingOptions, () => {
+          console.log("Done training?");
+        });
       },
-      
+
       setToRecordFrame(frame) {
         if (frame.hands) {
           this.hands.forEach((hand, hIndex) =>
@@ -229,13 +245,11 @@ window.addEventListener("load", function () {
         if (this.playbackFrameCount !== undefined) {
           console.log("Stop playback", this.playbackRec);
           this.playbackFrameCount = undefined;
-            this.handsfree.unpause();
+          this.handsfree.unpause();
         } else {
-         
           console.log("Start playback", this.playbackRec);
-          this.playbackFrameCount = 0
+          this.playbackFrameCount = 0;
           this.handsfree.pause();
-          
         }
       },
 
