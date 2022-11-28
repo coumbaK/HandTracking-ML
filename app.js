@@ -150,6 +150,8 @@ window.addEventListener("load", function () {
           }
         };
 
+        this.loadModel();
+
         p.mouseClicked = () => {
           // Mouse interaction
         };
@@ -190,14 +192,14 @@ window.addEventListener("load", function () {
           }
         },
       });
-
-      this.train();
+      this.createModel()
+      // this.train();
     },
 
     methods: {
-      train() {
-        console.log("TRAIN");
-        this.nn = ml5.neuralNetwork({
+      
+      createModel() {
+         this.nn = ml5.neuralNetwork({
           task: "classification",
           inputs: HAND_LANDMARK_COUNT * 2,
           outputs: this.classifierOptions.length,
@@ -205,6 +207,22 @@ window.addEventListener("load", function () {
           debug: true,
         });
 
+      },
+      
+      loadModel() {
+        const modelDetails = {
+          model: "model/mymodel.json",
+          metadata: "model/mymodel_meta.json",
+          weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/mymodel.weights.bin?v=1669609637099",
+        };
+        this.nn.load(modelDetails, () => {
+          console.log("Model loaded?")
+        });
+      },
+
+      train() {
+        console.log("TRAIN");
+       
         this.recordings.forEach((rec) => {
           console.log(rec.label);
           rec.frames.forEach((frame) => {
@@ -225,11 +243,14 @@ window.addEventListener("load", function () {
 
         // Step 6: train your neural network
         const trainingOptions = {
-          epochs: 32,
+          epochs: 20,
           batchSize: 12,
         };
         this.nn.train(trainingOptions, () => {
           console.log("Done training?");
+          this.nn.save("mymodel", () => {
+            console.log("Model?");
+          });
         });
       },
 
