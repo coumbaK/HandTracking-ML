@@ -39,10 +39,11 @@ window.addEventListener("load", function () {
            <button @click="togglePlayback">▶️</button> 
          </div>
          
-         <div v-if="classifierOptions">
-           <select>
+         <div v-if="classifierOptions" >
+           <select v-model="selectedOption">
              <option v-for="option in classifierOptions">{{option}}</option>
            </select>
+           {{selectedOption}}
          </div>
          <div>
            <span class="label">label:</span><span class="value">{{label}}</span>
@@ -184,9 +185,38 @@ window.addEventListener("load", function () {
           }
         },
       });
+      
+      this.train()
     },
 
     methods: {
+      
+      train() {
+        console.log("TRAIN")
+        this.nn = ml5.neuralNetwork({
+  task: 'classification',
+           inputs: HAND_LANDMARK_COUNT*2,
+           outputs: this.classifierOptions.length,
+  debug: true
+});
+        
+        this.recordings.forEach(rec => {
+          console.log(rec.label)
+          rec.frames.forEach(rec => )
+  // const inputs = {
+  //   r: item.r, 
+  //   g: item.g, 
+  //   b: item.b
+  // };
+  // const output = {
+  //   color: item.color
+  // };
+
+  // nn.addData(inputs, output);
+});
+
+      },
+      
       setToRecordFrame(frame) {
         if (frame.hands) {
           this.hands.forEach((hand, hIndex) =>
