@@ -134,6 +134,15 @@ window.addEventListener("load", function () {
           p.clear();
 
           hands.forEach((h) => h.draw(p));
+          p.fill(100)
+          hands.forEach((h) => {
+            h.points.forEach(pt => {
+              p.textSize(30)
+              p.text(h.label, ...pt)
+            })
+            
+          });
+          
 
           if (face.isActive) face.drawDebug(p);
 
@@ -171,7 +180,6 @@ window.addEventListener("load", function () {
         detectHands: this.recordHands,
         detectFace: this.recordFace,
         onFrame: (frameCount) => {
-          
           // A frame happened! Record it?
           if (this.isRecording) {
             console.log("record frame");
@@ -189,27 +197,25 @@ window.addEventListener("load", function () {
 
             this.currentRecording.frames.push(frame);
           }
-          
-           
-            // Make a precition?
-            // console.log(frameCount)
-            if (frameCount %10 == 0) {
-              let data = hands.map(hand => hand.toData())
-              data.forEach(handData => {
-                if (handData) {
-                  // console.log("Predict on ", handData.length)
-                  this.nn.predict(handData, (error, prediction) => {
-                    // console.log("Predicted", prediction)
-                    let index = indexOfMax(prediction.map(s => s.value))
-                   
-                    let label = this.classifierOptions[index]
-                     console.log(index, label)
-                    
-                  })
-                }
-              })
-              
-            }
+
+          // Make a precition?
+          // console.log(frameCount)
+          if (frameCount % 10 == 0) {
+            let data = hands.map((hand) => hand.toData());
+            data.forEach((handData, hIndex) => {
+              if (handData) {
+                // console.log("Predict on ", handData.length)
+                this.nn.predict(handData, (error, prediction) => {
+                  let index = indexOfMax(prediction.map((s) => s.value));
+
+                  let label = this.classifierOptions[index];
+                  console.log("Predicted", label)
+                  
+                  hands[hIndex].label = label;
+                });
+              }
+            });
+          }
         },
       });
       this.createModel();
@@ -235,7 +241,8 @@ window.addEventListener("load", function () {
           metadata: "model/model_meta.json",
 
           weights:
-            "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669610244323",
+            // "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669610244323",
+            "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669646418329",
         };
         this.nn.load(modelDetails, () => {
           console.log("Model loaded?", this.nn);
@@ -346,19 +353,19 @@ window.addEventListener("load", function () {
 });
 
 function indexOfMax(arr) {
-    if (arr.length === 0) {
-        return -1;
+  if (arr.length === 0) {
+    return -1;
+  }
+
+  var max = arr[0];
+  var maxIndex = 0;
+
+  for (var i = 1; i < arr.length; i++) {
+    if (arr[i] > max) {
+      maxIndex = i;
+      max = arr[i];
     }
+  }
 
-    var max = arr[0];
-    var maxIndex = 0;
-
-    for (var i = 1; i < arr.length; i++) {
-        if (arr[i] > max) {
-            maxIndex = i;
-            max = arr[i];
-        }
-    }
-
-    return maxIndex;
+  return maxIndex;
 }
