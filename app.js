@@ -2,6 +2,8 @@
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 400;
+let ALL_TASKS = {}
+
 let p = undefined;
 
 // const VIDEO_SRC = [
@@ -31,6 +33,13 @@ window.addEventListener("load", function () {
     template: `<div id="app">
       
       <div id="controls">
+      
+          <div>
+           <select v-model="taskID">
+             <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
+           </select>
+            
+         </div>
          
          <div>
            <select v-model="playbackRec">
@@ -320,25 +329,35 @@ window.addEventListener("load", function () {
           this.recordings.push(this.currentRecording);
           this.currentRecording = undefined;
 
-          let data = JSON.stringify(this.recordings);
+//           https://stackoverflow.com/questions/9339870/how-to-reduce-numbers-significance-in-jsons-stringify
+          let data = JSON.stringify(this.recordings, function(key, val) {
+    return val.toFixed ? Number(val.toFixed(3)) : val;
+})
+          
           localStorage.setItem("recordings", data);
         }
       },
     },
 
-    // We will use your data object as the data for Vue
+  
     data() {
+      
+      // Load recordings      
       let data = localStorage.getItem("recordings");
       let recordings = [];
       if (data) recordings = JSON.parse(data);
-      console.log("Loaded recordings", recordings);
+      
+      
       return {
         playbackRec: recordings[0],
         playbackFrameCount: undefined,
 
         classifierOptions: ["🗡", "🛡", "🙃"],
         selectedOption: "🗡",
-
+        
+        allTasks: ALL_TASKS,
+        selectedTaskID: Object.keys(ALL_TASKS)[0],
+        
         // Recording
         isRecording: true,
         recordHands: true,
@@ -352,20 +371,3 @@ window.addEventListener("load", function () {
   });
 });
 
-function indexOfMax(arr) {
-  if (arr.length === 0) {
-    return -1;
-  }
-
-  var max = arr[0];
-  var maxIndex = 0;
-
-  for (var i = 1; i < arr.length; i++) {
-    if (arr[i] > max) {
-      maxIndex = i;
-      max = arr[i];
-    }
-  }
-
-  return maxIndex;
-}
