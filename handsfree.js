@@ -1,20 +1,26 @@
 /* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands */
 
 
+let handsfree = undefined;
 function initHandsFree(face, hands) {
 	console.log("Init handsfree")
 	let updateCount = 0
 	// From the handsfree demos (mostly)
-	handsfree = new Handsfree({
+	let handsfree = new Handsfree({
 		showDebug: true,
-		hands: true
+		hands: true,
+    facemesh: true
 	})
 
-	handsfree.update({facemesh: true})
 
 	// Let's create a plugin called "logger" to console.log the data
 	handsfree.use('logger', (data) => {
 		updateCount++
+    
+    const el = document.getElementById("handsfree-canvas-video-1")
+    console.log("EL", el)
+    handsfree.aspectRatio = el.width/el.height
+          
 		// I like to always bail if there's no data,
 		// which might happen if you swap out hands for the face later on
 		if (!data.hands) return
@@ -51,7 +57,7 @@ function initHandsFree(face, hands) {
       // console.log(faceMeshData)
       face.isActive = true
       face.setTo(faceMeshData)
-      console.log(face.nose)
+      // console.log(face.nose)
      
 			// for (var i = 0; i < face.points.length; i++) {
 			// 	// setPoint(face.points[i], faceMesh[i])
@@ -60,14 +66,14 @@ function initHandsFree(face, hands) {
 
 		
 		if (data.hands.multiHandLandmarks && data.hands.multiHandLandmarks.length > 0) {
-			console.log("-- hands -- ")
+			// console.log("-- hands -- ", data.hands)
       data.hands.multiHandLandmarks.forEach((handData, index) => {
-				// setPoint(hand[0].points[i], data.hands.multiHandLandmarks[0][i])
-				// hand[0].visible = true
+        hands[index].setTo(handData)
+			
       })
 		
 		} else {
-			console.log("-- no hands -- ")
+			// console.log("-- no hands -- ")
 		}
 		// calculateMetaTrackingData()
 

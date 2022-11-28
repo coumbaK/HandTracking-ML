@@ -36,8 +36,18 @@ button.active {
   background-color: hsla(100, 50%, 90%, 1);
 }
 
+
 .handsfree-video {
+  display: none;
+}
+
+.handsfree-video, .handsfree-canvas  {
 /*   display: none; */
+
+    z-index: 200;
+  top: 0px;
+  left: 0px;
+  position: absolute;
   width: 300px;
 }
 
@@ -52,13 +62,7 @@ button.active {
 }
 
 
-.handsfree-canvas {
-  z-index: 200;
-  top: 0px;
-  left: 0px;
-  position: absolute;
-  width: 300px;
-}
+
 
 video {
   left: 0px;

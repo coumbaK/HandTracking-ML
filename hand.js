@@ -12,14 +12,13 @@ class Hand {
     
   }
   
-  update(data) {
-    if (data) {
-    this.points.forEach((pt,index) => {
+  setTo(dataPoints) {
+    if (dataPoints)
+    this.points.forEach((pt, index) => {
+      let pt2 = dataPoints[index];
       // console.log(data.landmarks[index])
-      pt.setTo(data.landmarks[index])
+      pt.setTo(pt2.x, pt2.y);
     })
-    } else {
-      console.warn("No data for handtracking")
-    }
+  
   }
 }
