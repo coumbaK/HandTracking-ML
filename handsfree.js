@@ -1,9 +1,8 @@
-/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands */
 
 
 let handsfree = undefined;
-function initHandsFree(face, hands) {
-	console.log("Init handsfree")
+function initHandsFree(face, hands, p) {
+	console.log("---- Init handsfree ----")
 	let updateCount = 0
 	// From the handsfree demos (mostly)
 	let handsfree = new Handsfree({
@@ -18,9 +17,11 @@ function initHandsFree(face, hands) {
 		updateCount++
     
     const el = document.getElementById("handsfree-canvas-video-1")
-    console.log("EL", el)
+    // console.log("EL", el)
     handsfree.aspectRatio = el.width/el.height
-          
+    // console.log(handsfree.aspectRation)    
+    
+    
 		// I like to always bail if there's no data,
 		// which might happen if you swap out hands for the face later on
 		if (!data.hands) return
@@ -33,7 +34,8 @@ function initHandsFree(face, hands) {
 
 // 		console.log("track #", updateCount)
 
-		
+		/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
+
 // 		// Only set position if visible
 // 		// Also smooth with the previous point
 // 		// pt.setToLerp((meshPt.x,meshPt.y), pt, app.smooth)
@@ -48,6 +50,9 @@ function initHandsFree(face, hands) {
 // 			pt.visible = meshPt.visible
 // 		}
     
+    let settings = {aspectRatio: handsfree.aspectRatio, scale: p.width, setPoint(pt) {
+      
+    }}
 
 		// Set the points to the current mesh
 		if (data.facemesh &&  data.facemesh.multiFaceLandmarks &&  data.facemesh.multiFaceLandmarks.length > 0) {
@@ -56,7 +61,7 @@ function initHandsFree(face, hands) {
 			// Copy over all of the face data
       // console.log(faceMeshData)
       face.isActive = true
-      face.setTo(faceMeshData)
+      face.setTo(faceMeshData, settings)
       // console.log(face.nose)
      
 			// for (var i = 0; i < face.points.length; i++) {
@@ -67,10 +72,11 @@ function initHandsFree(face, hands) {
 		
 		if (data.hands.multiHandLandmarks && data.hands.multiHandLandmarks.length > 0) {
 			// console.log("-- hands -- ", data.hands)
-      data.hands.multiHandLandmarks.forEach((handData, index) => {
-        hands[index].setTo(handData)
-			
+      hands.forEach((hand, index) => {
+        let handData = data.hands.multiHandLandmarks[index]
+        hand.setTo(handData, settings)
       })
+      
 		
 		} else {
 			// console.log("-- no hands -- ")

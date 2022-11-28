@@ -1,8 +1,9 @@
-/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands */
+/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 500;
 let p = undefined;
+
 
 const VIDEO_SRC = [
   //    https://www.lvlt.org/thequarantinemonologues
@@ -105,6 +106,7 @@ window.addEventListener("load", function () {
       CANVAS_EL.style.height = CANVAS_HEIGHT + "px";
 
       p = new p5(s, CANVAS_EL);
+      console.log(p, CANVAS_WIDTH, CANVAS_HEIGHT)
 
       // When the video is loaded, start face detection
       let video = this.$refs.video;
@@ -114,7 +116,7 @@ window.addEventListener("load", function () {
           // this.startDetection();
         });
 
-      initHandsFree(face, hands);
+      initHandsFree(face, hands, p);
 
       // this.switchInput();
     },
