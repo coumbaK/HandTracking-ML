@@ -22,6 +22,10 @@ class Trackable {
     } else this.isActive = false;
   }
 
+  toData() {
+    return this.points.flat()
+  }
+  
   postSet() {}
 
   setTo(predictedPts, settings) {

@@ -1,7 +1,7 @@
 let handsfree = undefined;
 function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
   console.log("---- Init handsfree ----");
-  let updateCount = 0;
+  let frameCount = 0;
 
   // From the handsfree demos (mostly)
   let handsfree = new Handsfree({
@@ -12,7 +12,8 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
 
   // Let's create a plugin called "logger" to console.log the data
   handsfree.use("logger", (data) => {
-    updateCount++;
+   
+    frameCount++
 
     const el = document.getElementsByClassName("handsfree-debugger")[0];
     const videoEl = document.getElementById("handsfree-canvas-video-1");
@@ -63,7 +64,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
       // console.log("-- no hands -- ")
     }
 
-    onFrame();
+    onFrame(frameCount);
   });
 
   // Start webcam and tracking (personally, I always like to ask first)

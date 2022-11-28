@@ -150,7 +150,6 @@ window.addEventListener("load", function () {
           }
         };
 
-        
         p.mouseClicked = () => {
           // Mouse interaction
         };
@@ -171,7 +170,8 @@ window.addEventListener("load", function () {
         p,
         detectHands: this.recordHands,
         detectFace: this.recordFace,
-        onFrame: () => {
+        onFrame: (frameCount) => {
+          
           // A frame happened! Record it?
           if (this.isRecording) {
             console.log("record frame");
@@ -189,43 +189,56 @@ window.addEventListener("load", function () {
 
             this.currentRecording.frames.push(frame);
           }
+          
+           
+            // Make a precition?
+            // console.log(frameCount)
+            if (frameCount %10 == 0) {
+              let data = hands.map(hand => hand.toData())
+              data.forEach(handData => {
+                console.log("Predict on ", handData.length)
+                this.nn.predict(handData, (error, prediction) => {
+                  console.log("Predicted", error, prediction)
+                })
+              })
+              
+            }
         },
       });
-      this.createModel()
+      this.createModel();
       this.loadModel();
 
       // this.train();
     },
 
     methods: {
-      
       createModel() {
-         this.nn = ml5.neuralNetwork({
+        this.nn = ml5.neuralNetwork({
           task: "classification",
           inputs: HAND_LANDMARK_COUNT * 2,
           outputs: this.classifierOptions.length,
           outputLabels: this.classifierOptions,
           debug: true,
         });
-
       },
-      
+
       loadModel() {
         const modelDetails = {
           model: "model/model.json",
           metadata: "model/model_meta.json",
-          
-        
-          weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669610244323",
+
+          weights:
+            "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669610244323",
         };
         this.nn.load(modelDetails, () => {
-          console.log("Model loaded?")
+          console.log("Model loaded?", this.nn);
+          this.nn.hasLoadedModel = true;
         });
       },
 
       train() {
         console.log("TRAIN");
-       
+
         this.recordings.forEach((rec) => {
           console.log(rec.label);
           rec.frames.forEach((frame) => {
@@ -233,7 +246,6 @@ window.addEventListener("load", function () {
 
             // Add this hand as a labeled data
             frame.hands.forEach((hand) => {
-              console.log(hand.flat().length);
               const inputs = hand.flat();
               const outputs = rec.label;
               console.log(inputs, outputs);
