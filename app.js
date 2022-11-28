@@ -1,4 +1,4 @@
-/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
+/* globals Vector2D, allMasks, ml5, Vue, Face, Hand,oneHot,  p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 400;
@@ -33,9 +33,9 @@ window.addEventListener("load", function () {
     template: `<div id="app">
       
       <div id="controls">
-      
+         
           <div>
-           <select v-model="taskID">
+           <select v-model="selectedTaskID">
              <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
            </select>
             
@@ -43,34 +43,31 @@ window.addEventListener("load", function () {
          
          <div>
            <select v-model="playbackRec">
-             <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toString()}}</option>
+             <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toLocaleTimeString()}}</option>
            </select>
            <button @click="togglePlayback">▶️</button> 
+           <button @click="togglePlayback">🗑</button> 
          </div>
          
-         <div v-if="classifierOptions" >
-           <select v-model="selectedOption">
-             <option v-for="option in classifierOptions">{{option}}</option>
-           </select>
-           {{selectedOption}}
-         </div>
          <div>
-           <span class="label">label:</span><span class="value">{{label}}</span>
+           <div v-if="classifierOptions" >
+             <select v-model="selectedOption">
+               <option v-for="option in classifierOptions">{{option}}</option>
+             </select>
+             {{selectedOption}}
+           </div>
+           <div>
+             <span class="label">Current label:</span><span class="value">{{label}}</span>
+           </div>
          </div>
+         
         
         <button :class="{active:isRecording}" @click="toggleRecording">⏺</button>
-      <button :class="{active:recordFace}" @click="recordFace=!recordFace">😐</button>
-      <button :class="{active:recordHands}" @click="recordHands=!recordHands">🖐</button>
-      <div v-if="isRecording">Frames: {{currentRecording.frames.length}}</div>
-      
-      <details>
-        <summary>recordings</summary>
-        <table>
-          <tr v-for="recording in recordings">
-            <td></td>
-          </tr>
-        </table>
-      </details>
+        <button :class="{active:recordFace}" @click="recordFace=!recordFace">😐</button>
+        <button :class="{active:recordHands}" @click="recordHands=!recordHands">🖐</button>
+        <div v-if="isRecording">Frames: {{currentRecording.frames.length}}</div>
+
+     
       </div>
 	    <div id="view" ref="view">
         
@@ -81,6 +78,10 @@ window.addEventListener("load", function () {
 		  
   </div>`,
     computed: {
+      task() {
+        return this.allTasks[this.selectedTaskID]
+      },
+      
       inactiveVideoElement() {
         return !this.webcamMode ? this.webcam.elt : this.$refs.video;
       },
@@ -89,13 +90,18 @@ window.addEventListener("load", function () {
       },
 
       label() {
-        if (this.classifierOptions) {
+        // What is the current label of this training data?
+        if (this.task.classifierOptions) {
+          let options = this.task.classifierOptions
           // The label is a one-hot of the classifier
-          let label = new Array(this.classifierOptions.length).fill(0);
-          let index = this.classifierOptions.indexOf(this.selectedOption);
-          console.log(index, this.selectedOption, this.classifierOptions);
-          label[index] = 1;
-          return label;
+          let index = options.indexOf(this.selectedOption);
+          let oneHotLabel = oneHot(options.length, index)
+   
+          return oneHotLabel;
+        }
+        else {
+          return this.sliderLabels.slice()
+        
         }
       },
     },

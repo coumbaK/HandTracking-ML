@@ -1,3 +1,9 @@
+function oneHot(count, index) {
+   let arr = new Array(count).fill(0);
+    arr[index] = 1;
+  return arr
+}
+
 function quickdrawToVectors(data) {
   // Reorder quickdraw data to make it more convenient for drawing with P5
   return data.drawing.map((stroke) => {
