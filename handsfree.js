@@ -1,103 +1,73 @@
-
-
 let handsfree = undefined;
 function initHandsFree(face, hands, p) {
-	console.log("---- Init handsfree ----")
-	let updateCount = 0
-	// From the handsfree demos (mostly)
-	let handsfree = new Handsfree({
-		showDebug: true,
-		hands: true,
-    facemesh: true
-	})
+  console.log("---- Init handsfree ----");
+  let updateCount = 0;
 
+  // From the handsfree demos (mostly)
+  let handsfree = new Handsfree({
+    showDebug: true,
+    hands: true,
+    facemesh: true,
+  });
 
-	// Let's create a plugin called "logger" to console.log the data
-	handsfree.use('logger', (data) => {
-		updateCount++
-    
-    const el = document.getElementById("handsfree-canvas-video-1")
+  // handsfree.update({
+  //   facemesh: false,
+  //   hands: false,
+  // });
+
+  console.log(handsfree);
+
+  // Let's create a plugin called "logger" to console.log the data
+  handsfree.use("logger", (data) => {
+    updateCount++;
+
+    const el = document.getElementById("handsfree-canvas-video-1");
     // console.log("EL", el)
-    handsfree.aspectRatio = el.width/el.height
-    // console.log(handsfree.aspectRation)    
-    
-    
-		// I like to always bail if there's no data,
-		// which might happen if you swap out hands for the face later on
-		if (!data.hands) return
+    handsfree.aspectRatio = el.width / el.height;
+    // console.log(handsfree.aspectRation)
 
-		// Log the data  
-		// Vue.set(app.tracking, "hands", data.hands.multiHandLandmarks)
-// 		if (updateCount % 30 == 0) {
-// 			console.log(data.hands.multiHandLandmarks)
-// 		}
+    // I like to always bail if there's no data,
+    // which might happen if you swap out hands for the face later on
+    if (!data.hands) return;
 
-// 		console.log("track #", updateCount)
+    let xScale = handsfree.aspectRatio / (p.width / p.height);
 
-		/* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
+    let settings = {
+      aspectRatio: handsfree.aspectRatio,
+      scale: p.width,
+      setPoint(pt, hfPt) {
+        pt.setTo(p.width - hfPt.x * p.height * xScale, hfPt.y * p.height);
+      },
+    };
 
-// 		// Only set position if visible
-// 		// Also smooth with the previous point
-// 		// pt.setToLerp((meshPt.x,meshPt.y), pt, app.smooth)
-// 		function setPoint(pt, meshPt) {
-		
-			
-// 			let x = (.5 - meshPt.x)*canvasW
-// 			let y = (meshPt.y - .5)*canvasH
-// 			pt.setTo(x, y)
-// 			if (pt.index ===47)
-// 				console.log(pt.toFixed())
-// 			pt.visible = meshPt.visible
-// 		}
-           let xScale = handsfree.aspectRatio/(p.width/p.height)
-
-    let settings = {aspectRatio: handsfree.aspectRatio, scale: p.width, setPoint(pt, hfPt) {
-       pt.setTo(p.width -hfPt.x*p.height*xScale, hfPt.y*p.height)
-    }}
-
-		// Set the points to the current mesh
-		if (data.facemesh &&  data.facemesh.multiFaceLandmarks &&  data.facemesh.multiFaceLandmarks.length > 0) {
-			let faceMeshData = data.facemesh.multiFaceLandmarks[0]
-			// console.log("update face")
-			// Copy over all of the face data
+    // Set the points to the current mesh
+    if (
+      data.facemesh &&
+      data.facemesh.multiFaceLandmarks &&
+      data.facemesh.multiFaceLandmarks.length > 0
+    ) {
+      let faceMeshData = data.facemesh.multiFaceLandmarks[0];
+      // console.log("update face")
+      // Copy over all of the face data
       // console.log(faceMeshData)
-      face.isActive = true
-      face.setTo(faceMeshData, settings)
-      // console.log(face.nose)
-     
-			// for (var i = 0; i < face.points.length; i++) {
-			// 	// setPoint(face.points[i], faceMesh[i])
-			// }
-		}
+      face.isActive = true;
+      face.setTo(faceMeshData, settings);
+    }
 
-		
-		if (data.hands.multiHandLandmarks && data.hands.multiHandLandmarks.length > 0) {
-			// console.log("-- hands -- ", data.hands)
+    if (
+      data.hands.multiHandLandmarks &&
+      data.hands.multiHandLandmarks.length > 0
+    ) {
+      // console.log("-- hands -- ", data.hands)
       hands.forEach((hand, index) => {
-        let handData = data.hands.multiHandLandmarks[index]
-        hand.setTo(handData, settings)
-      })
-      
-		
-		} else {
-			// console.log("-- no hands -- ")
-		}
-		// calculateMetaTrackingData()
+        let handData = data.hands.multiHandLandmarks[index];
+        hand.setTo(handData, settings);
+      });
+    } else {
+      // console.log("-- no hands -- ")
+    }
+  });
 
-
-
-// 		console.log( app.tracking.face[300])
-// 		Vue.set(app.tracking, "face", )
-// 		Vue.set(app.tracking, "image", data.facemesh.image)
-// 		console.log(app.tracking)
-
-// 		app.image.src = data.facemesh.image.toDataURL();
-
-
-	})
-
-
-	// Start webcam and tracking (personally, I always like to ask first)
-	handsfree.start()
-
+  // Start webcam and tracking (personally, I always like to ask first)
+  handsfree.start();
 }

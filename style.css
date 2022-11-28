@@ -38,7 +38,7 @@ button.active {
 
 
 .handsfree-video {
-  display: none;
+/*   display: none; */
 }
 
 .handsfree-video, .handsfree-canvas  {

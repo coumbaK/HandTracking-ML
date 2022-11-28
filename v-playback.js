@@ -39,6 +39,7 @@ Vue.component("tracking-recorder", {
   },
   data() {
     return {
+      handsfree: handsfree,
       recordHands: true,
       recordFace: false,
       currentRecording: undefined,
