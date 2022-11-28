@@ -150,8 +150,7 @@ window.addEventListener("load", function () {
           }
         };
 
-        this.loadModel();
-
+        
         p.mouseClicked = () => {
           // Mouse interaction
         };
@@ -193,6 +192,8 @@ window.addEventListener("load", function () {
         },
       });
       this.createModel()
+      this.loadModel();
+
       // this.train();
     },
 
@@ -211,9 +212,11 @@ window.addEventListener("load", function () {
       
       loadModel() {
         const modelDetails = {
-          model: "model/mymodel.json",
-          metadata: "model/mymodel_meta.json",
-          weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/mymodel.weights.bin?v=1669609637099",
+          model: "model/model.json",
+          metadata: "model/model_meta.json",
+          
+        
+          weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669610244323",
         };
         this.nn.load(modelDetails, () => {
           console.log("Model loaded?")
@@ -248,7 +251,7 @@ window.addEventListener("load", function () {
         };
         this.nn.train(trainingOptions, () => {
           console.log("Done training?");
-          this.nn.save("mymodel", () => {
+          this.nn.save(() => {
             console.log("Model?");
           });
         });
