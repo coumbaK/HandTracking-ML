@@ -10,16 +10,17 @@ class Hand {
     this.points.forEach((pt) => p.circle(...pt, 20));
   }
 
-  setTo(dataPoints) {
-    if (dataPoints === undefined) {
+  setTo(predictedPts, settings) {
+    if (predictedPts === undefined) {
       // No hand data
       this.isActive = false
     } else {
       this.isActive = true
       this.points.forEach((pt, index) => {
-        let pt2 = dataPoints[index];
-        // console.log(data.landmarks[index])
-        pt.setTo(pt2.x, pt2.y);
+        let pt1 = predictedPts[index];
+        if (settings.setPoint) {
+          settings.setPoint(pt, pt1);
+        }
       });
     }
   }

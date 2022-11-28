@@ -49,9 +49,10 @@ function initHandsFree(face, hands, p) {
 // 				console.log(pt.toFixed())
 // 			pt.visible = meshPt.visible
 // 		}
-    
-    let settings = {aspectRatio: handsfree.aspectRatio, scale: p.width, setPoint(pt) {
-      
+           let xScale = handsfree.aspectRatio/(p.width/p.height)
+
+    let settings = {aspectRatio: handsfree.aspectRatio, scale: p.width, setPoint(pt, hfPt) {
+       pt.setTo(p.width -hfPt.x*p.height*xScale, hfPt.y*p.height)
     }}
 
 		// Set the points to the current mesh

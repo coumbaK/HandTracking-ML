@@ -1,7 +1,7 @@
 /* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
 
 const CANVAS_WIDTH = 600;
-const CANVAS_HEIGHT = 500;
+const CANVAS_HEIGHT = 400;
 let p = undefined;
 
 

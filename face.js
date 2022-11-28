@@ -1,6 +1,5 @@
 /* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
 
-
 let allMasks = {};
 
 /**
@@ -170,10 +169,10 @@ class Face {
     // console.log("set to prediction", prediction)
     if (predictedPts) {
       this.points.forEach((pt, index) => {
-        let pt1 = predictedPts[index]
-        pt.setTo(pt1.x, pt1.y);
-        // if (settings.aspectRatio)
-        pt.mult(settings.scale)
+        let pt1 = predictedPts[index];
+        if (settings.setPoint) {
+          settings.setPoint(pt, pt1);
+        }
       });
       // Update various calculations
       this.sides.forEach((side) => {
