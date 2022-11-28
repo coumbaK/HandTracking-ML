@@ -31,12 +31,15 @@ window.addEventListener("load", function () {
     template: `<div id="app">
       
       <div id="controls">
-       
+         
+         <div>
+           <span class="label">label:</span><span class="value">{{label}}</span>
+         </div>
         
         <button :class="{active:isRecording}" @click="toggleRecording">⏺</button>
       <button :class="{active:recordFace}" @click="recordFace=!recordFace">😐</button>
       <button :class="{active:recordHands}" @click="recordHands=!recordHands">🖐</button>
-      <div v-if="isRecording">Frames: {{currentRecording.length}}</div>
+      <div v-if="isRecording">Frames: {{currentRecording.frames.length}}</div>
       
       <details>
         <summary>recordings</summary>
@@ -66,25 +69,24 @@ window.addEventListener("load", function () {
 
     watch: {
       recordFace() {
-         this.handsfree.update({
-    facemesh: this.recordFace,
-    hands: this.recordHands,
-  });
+        this.handsfree.update({
+          facemesh: this.recordFace,
+          hands: this.recordHands,
+        });
       },
-      
-       recordHands() {
-         this.handsfree.update({
-    facemesh: this.recordFace,
-    hands: this.recordHands,
-  });
+
+      recordHands() {
+        this.handsfree.update({
+          facemesh: this.recordFace,
+          hands: this.recordHands,
+        });
       },
-      
     },
     mounted() {
       // Listen for space bar
-      document.body.onkeyup =  (e) => {
+      document.body.onkeyup = (e) => {
         if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
-         this.toggleRecording()
+          this.toggleRecording();
         }
       };
 
@@ -122,59 +124,69 @@ window.addEventListener("load", function () {
       p = new p5(s, CANVAS_EL);
       console.log(p, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-// Start handsfree
-      this.handsfree = initHandsFree({face, hands, p, 
-                     detectHands: this.recordHands,
-                     detectFace: this.recordFace,
-                     onFrame: () => {
-        // A frame happened! Record it?
-                       if (this.isRecording) {
-                         console.log("record frame")
-                         
-// Do we have any data?
-                        
-                         let frame = {
-                          
-                         }
-                         if (this.recordFace)
-                           frame.face = face.toRecord()
-                          if (this.recordHands)
-                           frame.hands = hands.map(hand => hand.toRecord()) 
-                          this.currentRecording.push(frame)
-                         
-                       }
-      }});
+      // Start handsfree
+      this.handsfree = initHandsFree({
+        face,
+        hands,
+        p,
+        detectHands: this.recordHands,
+        detectFace: this.recordFace,
+        onFrame: () => {
+          // A frame happened! Record it?
+          if (this.isRecording) {
+            console.log("record frame");
 
-      
+            // Do we have any data?
+
+            let frame = {};
+            if (this.recordFace) frame.face = face.toRecord();
+            if (this.recordHands)
+              frame.hands = hands.map((hand) => hand.toRecord());
+            this.currentRecording.frames.push(frame);
+            
+            
+          }
+        },
+      });
     },
 
     methods: {
-      toggleRecording() {
-        this.isRecording = !this.isRecording
-        if (this.isRecording) {
-          console.log("START RECORDING")
-          
-          this.currentRecording = []
-          
-        } else {
-          console.log("STOP RECORDING")
-        }
-      }
       
+      setToRecordFrame(frame) {
+        if (frame.hands) {
+          this.hands.forEach((hand, hIndex) => hand.setToRecord(frame.hands[hIndex]))
+        }
+      },
+      
+      toggleRecording() {
+        this.isRecording = !this.isRecording;
+        if (this.isRecording) {
+          console.log("START RECORDING");
+
+          this.currentRecording = {
+            label: label,
+            frames: []
+          };
+        } else {
+          console.log("STOP RECORDING");
+          console.log(this.currentRecording)
+        }
+      },
     },
 
     // We will use your data object as the data for Vue
     data() {
-      let lastID = localStorage.getItem("lastMask");
-      if (!allMasks[lastID]) lastID = Object.keys(allMasks)[0];
+     let recordings = localStorage.getItem("recordings") || []
       return {
+        classifierOptions: ["👍", "👎", "🖐", "👆", "🖖"],
+        label: [0, 0, 1],
         // Recording
         isRecording: true,
         recordHands: true,
         recordFace: false,
         currentRecording: undefined,
         isRecording: false,
-        recordings: localStorage.getItem("recordings"),
+        recordings: recordings,
       };
     },
     el: "#app",

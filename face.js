@@ -1,6 +1,54 @@
 /* globals Vector2D, allMasks, ml5, Vue, Face, Hand, p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
 
-let allMasks = {};
+class Trackable {
+  constructor() {
+    this.isActive = false;
+    this.points = [];
+  }
+  toRecord() {
+    return this.points.map((pt) => pt.slice(0, 2));
+  }
+
+  fromRecord(record) {
+    if (record) {
+      this.isActive = true;
+      this.points.forEach((pt1, index) => this.points[index].setTo(pt1));
+      this.postSet();
+    } else this.isActive = false;
+  }
+
+  postSet() {}
+
+  setTo(predictedPts, settings) {
+    if (predictedPts === undefined) {
+      // No hand data
+      this.isActive = false;
+    } else {
+      this.isActive = true;
+      this.points.forEach((pt, index) => {
+        let pt1 = predictedPts[index];
+        if (settings.setPoint) {
+          settings.setPoint(pt, pt1);
+        }
+      });
+      this.postSet();
+    }
+  }
+
+  draw(p) {
+    this.points.forEach((pt) => p.circle(...pt, 20));
+  }
+}
+
+const HAND_LANDMARK_COUNT = 21;
+class Hand extends Trackable {
+  constructor() {
+    super();
+    for (var i = 0; i < HAND_LANDMARK_COUNT; i++) {
+      this.points[i] = new Vector2D(Math.random() * 400, Math.random() * 300);
+    }
+  }
+}
 
 /**
  * Class for Face
@@ -115,15 +163,14 @@ const FACE_INDICES = {
     },
   ],
 };
-const LANDMARK_COUNT = 468;
+const FACE_LANDMARK_COUNT = 468;
 
-class Face {
+class Face extends Trackable {
   constructor() {
-    let predictionCount = -1;
-
+    super()
+   
     //     All faces have 468 points
-    this.points = [];
-    for (var i = 0; i < LANDMARK_COUNT; i++) {
+    for (var i = 0; i < FACE_LANDMARK_COUNT; i++) {
       let pt = new Vector2D(Math.random() * 400, Math.random() * 400);
       pt.index = i;
       this.points[i] = pt;
@@ -163,31 +210,13 @@ class Face {
     this.nose = this.centerLine[9];
   }
 
-  setTo(predictedPts, settings) {
-    this.predictionCount++;
-
-    // console.log("set to prediction", prediction)
-    if (predictedPts) {
-      this.points.forEach((pt, index) => {
-        let pt1 = predictedPts[index];
-        if (settings.setPoint) {
-          settings.setPoint(pt, pt1);
-        }
-      });
-      // Update various calculations
-      this.sides.forEach((side) => {
-        side.eyeCenter.setToLerp(side.eyeInner, side.eyeOuter, 0.5);
-        side.eyeWidth = side.eyeInner.getDistanceTo(side.eyeOuter);
-        side.eyeHeight = side.eyeTop.getDistanceTo(side.eyeBottom);
-        side.blink = side.eyeHeight / side.eyeWidth;
-      });
-    }
-  }
-
-  drawDebug(p) {
-    this.points.forEach((pt) => {
-      p.circle(...pt, 40);
-      // p.text(pt.index, ...pt)
+  postSet() {
+    // Update various calculations
+    this.sides.forEach((side) => {
+      side.eyeCenter.setToLerp(side.eyeInner, side.eyeOuter, 0.5);
+      side.eyeWidth = side.eyeInner.getDistanceTo(side.eyeOuter);
+      side.eyeHeight = side.eyeTop.getDistanceTo(side.eyeBottom);
+      side.blink = side.eyeHeight / side.eyeWidth;
     });
   }
 }
