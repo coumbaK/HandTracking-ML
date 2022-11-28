@@ -196,10 +196,17 @@ window.addEventListener("load", function () {
             if (frameCount %10 == 0) {
               let data = hands.map(hand => hand.toData())
               data.forEach(handData => {
-                console.log("Predict on ", handData.length)
-                this.nn.predict(handData, (error, prediction) => {
-                  console.log("Predicted", error, prediction)
-                })
+                if (handData) {
+                  // console.log("Predict on ", handData.length)
+                  this.nn.predict(handData, (error, prediction) => {
+                    // console.log("Predicted", prediction)
+                    let index = indexOfMax(prediction.map(s => s.value))
+                   
+                    let label = this.classifierOptions[index]
+                     console.log(index, label)
+                    
+                  })
+                }
               })
               
             }
@@ -337,3 +344,21 @@ window.addEventListener("load", function () {
     el: "#app",
   });
 });
+
+function indexOfMax(arr) {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    var max = arr[0];
+    var maxIndex = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            maxIndex = i;
+            max = arr[i];
+        }
+    }
+
+    return maxIndex;
+}
