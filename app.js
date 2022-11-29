@@ -2,7 +2,7 @@
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 400;
-let ALL_TASKS = {}
+let ALL_TASKS = {};
 
 let p = undefined;
 
@@ -29,18 +29,9 @@ window.addEventListener("load", function () {
   // otherwise the Vector2d extention-of-arrays
   // and the Vue extension of datatypes will fight
 
-  new Vue({
-    template: `<div id="app">
-      
-      <div id="controls">
-         
-          <div>
-           <select v-model="selectedTaskID">
-             <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
-           </select>
-            
-         </div>
-         
+  Vue.component("data-recorder", {
+    template: `<div>
+          
          <div>
            <select v-model="playbackRec">
              <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toLocaleTimeString()}}</option>
@@ -50,23 +41,69 @@ window.addEventListener("load", function () {
          </div>
          
          <div>
+           <!-- Label for this data --> 
            <div v-if="classifierOptions" >
              <select v-model="selectedOption">
                <option v-for="option in classifierOptions">{{option}}</option>
              </select>
-             {{selectedOption}}
+             
+            
            </div>
-           <div>
+           
+            <div class="callout">
              <span class="label">Current label:</span><span class="value">{{label}}</span>
            </div>
+          
          </div>
          
-        
+        <div>
         <button :class="{active:isRecording}" @click="toggleRecording">⏺</button>
-        <button :class="{active:recordFace}" @click="recordFace=!recordFace">😐</button>
-        <button :class="{active:recordHands}" @click="recordHands=!recordHands">🖐</button>
         <div v-if="isRecording">Frames: {{currentRecording.frames.length}}</div>
+        </div>
+        
+        
+    
+    </div>`,
+    mounted() {
+      // Listen for space bar
+      document.body.onkeyup = (e) => {
+        if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
+          this.toggleRecording();
+        }
+      };
+    },
+    data() {
+      // Load recordings
+      let data = localStorage.getItem("recordings");
+      let recordings = [];
+      if (data) recordings = JSON.parse(data);
 
+      return {
+        playbackRec: recordings[0],
+        playbackFrameCount: undefined,
+        currentRecording: undefined,
+        isRecording: false,
+        recordings: recordings,
+      };
+    },
+  });
+
+  new Vue({
+    template: `<div id="app">
+      
+      <div id="controls">
+        <div>
+          <button :class="{active:trackFace}" @click="trackFace=!trackFace">😐</button>
+          <button :class="{active:trackHands}" @click="trackHands=!trackHands">🖐</button>
+        </div>
+        
+          <div>
+           <select v-model="selectedTaskID">
+             <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
+           </select>
+            <data-recorder />
+         </div>
+         
      
       </div>
 	    <div id="view" ref="view">
@@ -79,9 +116,9 @@ window.addEventListener("load", function () {
   </div>`,
     computed: {
       task() {
-        return this.allTasks[this.selectedTaskID]
+        return this.allTasks[this.selectedTaskID];
       },
-      
+
       inactiveVideoElement() {
         return !this.webcamMode ? this.webcam.elt : this.$refs.video;
       },
@@ -92,45 +129,30 @@ window.addEventListener("load", function () {
       label() {
         // What is the current label of this training data?
         if (this.task.classifierOptions) {
-          let options = this.task.classifierOptions
+          let options = this.task.classifierOptions;
           // The label is a one-hot of the classifier
           let index = options.indexOf(this.selectedOption);
-          let oneHotLabel = oneHot(options.length, index)
-   
+          let oneHotLabel = oneHot(options.length, index);
+
           return oneHotLabel;
-        }
-        else {
-          return this.sliderLabels.slice()
-        
+        } else {
+          return this.sliderLabels.slice();
         }
       },
     },
 
-    watch: {
-      playbackRec() {
-        console.log("playbackRec", this.playbackRec);
-      },
+    watch: { 
       recordFace() {
-        this.handsfree.update({
-          facemesh: this.recordFace,
-          hands: this.recordHands,
-        });
+        this.updateHandsfree()
       },
 
       recordHands() {
-        this.handsfree.update({
-          facemesh: this.recordFace,
-          hands: this.recordHands,
-        });
+       this.updateHandsfree()
       },
     },
+    
     mounted() {
-      // Listen for space bar
-      document.body.onkeyup = (e) => {
-        if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
-          this.toggleRecording();
-        }
-      };
+      
 
       // Create P5 when we mount this element
       const s = (p0) => {
@@ -149,15 +171,13 @@ window.addEventListener("load", function () {
           p.clear();
 
           hands.forEach((h) => h.draw(p));
-          p.fill(100)
+          p.fill(100);
           hands.forEach((h) => {
-            h.points.forEach(pt => {
-              p.textSize(30)
-              p.text(h.label, ...pt)
-            })
-            
+            h.points.forEach((pt) => {
+              p.textSize(30);
+              p.text(h.label, ...pt);
+            });
           });
-          
 
           if (face.isActive) face.drawDebug(p);
 
@@ -224,8 +244,8 @@ window.addEventListener("load", function () {
                   let index = indexOfMax(prediction.map((s) => s.value));
 
                   let label = this.classifierOptions[index];
-                  console.log("Predicted", label)
-                  
+                  console.log("Predicted", label);
+
                   hands[hIndex].label = label;
                 });
               }
@@ -240,6 +260,14 @@ window.addEventListener("load", function () {
     },
 
     methods: {
+      
+      updateHandsfree() {
+        this.handsfree.update({
+          facemesh: this.trackFace,
+          hands: this.trackHands,
+        });
+      },
+      
       createModel() {
         this.nn = ml5.neuralNetwork({
           task: "classification",
@@ -335,45 +363,30 @@ window.addEventListener("load", function () {
           this.recordings.push(this.currentRecording);
           this.currentRecording = undefined;
 
-//           https://stackoverflow.com/questions/9339870/how-to-reduce-numbers-significance-in-jsons-stringify
-          let data = JSON.stringify(this.recordings, function(key, val) {
-    return val.toFixed ? Number(val.toFixed(3)) : val;
-})
-          
+          //           https://stackoverflow.com/questions/9339870/how-to-reduce-numbers-significance-in-jsons-stringify
+          let data = JSON.stringify(this.recordings, function (key, val) {
+            return val.toFixed ? Number(val.toFixed(3)) : val;
+          });
+
           localStorage.setItem("recordings", data);
         }
       },
     },
 
-  
     data() {
-      
-      // Load recordings      
-      let data = localStorage.getItem("recordings");
-      let recordings = [];
-      if (data) recordings = JSON.parse(data);
-      
-      
       return {
-        playbackRec: recordings[0],
-        playbackFrameCount: undefined,
-
         classifierOptions: ["🗡", "🛡", "🙃"],
         selectedOption: "🗡",
-        
+
         allTasks: ALL_TASKS,
         selectedTaskID: Object.keys(ALL_TASKS)[0],
-        
+
         // Recording
         isRecording: true,
-        recordHands: true,
-        recordFace: false,
-        currentRecording: undefined,
-        isRecording: false,
-        recordings: recordings,
+        trackHands: true,
+        trackFace: false,
       };
     },
     el: "#app",
   });
 });
-
