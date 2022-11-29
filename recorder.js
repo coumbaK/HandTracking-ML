@@ -12,20 +12,23 @@ class Recorder {
   }
   
   saveRecordings() {
-    console.log("Save recordings", this.recordings)
+   
     let data = JSON.stringify(this.recordings, function (key, val) {
-        return val?.toFixed ? Number(val.toFixed(3)) : val;
+      if (val !== undefined)
+        return val.toFixed ? Number(val.toFixed(3)) : val;
+      return undefined
       });
+    console.log(data)
     localStorage.setItem("recordings", data);
   }
   // ====================================
   // Recording
 
-  toggleRecording(recording) {
+  toggleRecording(label, labelDesc) {
     if (this.isRecording)
       this.stopRecording()
     else 
-      this.startRecording(recording)
+      this.startRecording(label, labelDesc)
   }
   
   startRecording(label, labelDesc) {
@@ -43,16 +46,30 @@ class Recorder {
   recordFrame(face, hands) {
     console.log("RECORDER - record frame")
     // Record a frame of hands and face data
+    
     let frame = {};
-    if (face.isActive) {
-      frame.face = face.toFrame();
-    }
+       // Only save valid face data, skip if its not active
+     
+    let faceData = face.toFrame();
+    if (faceData)
+      frame.face = faceData
+
 
     hands.forEach((hand, handIndex) => {
-      if (!frame.hands) frame.hands = [];
-      frame.hands.push(hand.toFrame());
+      
+      
+      let handData = hand.toFrame()
+     
+      // Only save valid hand data, skip if its not active
+      if (handData) {
+        // Add a field for the hands if it doesn't exist
+        if (!frame.hands) frame.hands = [];
+        frame.hands.push(handData);
+      }
+        
     });
-
+   
+    
     this.data.frames.push(frame);
   }
 
@@ -154,7 +171,7 @@ Vue.component("data-recorder", {
 
           <button  
             :class="{active:recorder.isRecording}" 
-            @click="recorder.toggleRecording()">
+            @click="recorder.toggleRecording(label, labelDesc)">
             ⏺
           </button>
         </div>
@@ -177,16 +194,22 @@ Vue.component("data-recorder", {
         </div>
 
         <!-- sliders -->
-        <table>
-          <tr v-for="(val, index) in sliderData"> 
-            <td style="width:40px;text-align:right">
-              {{val}}
-            </td>
-            <td>
-              <input min=0 max=1 step=.02 type="range" v-model="sliderData[index]"/>
-            </td>
-          </tr>
-        </table>
+        <div>
+          <label for="labelDesc">Landmark name:</label><br>
+          <input id="labelDesc" >
+          
+          <table>
+            <tr v-for="(val, index) in sliderData"> 
+              <td style="width:40px;text-align:right">
+                {{val}}
+              </td>
+              <td>
+                <input min=0 max=1 step=.02 type="range" v-model="sliderData[index]"/>
+              </td>
+            </tr>
+          </table>
+        </div>
+        
       </div>
       <div class="callout">
         <span class="label">Current label:</span><span class="value">{{label}}</span>
@@ -218,6 +241,13 @@ Vue.component("data-recorder", {
         return this.sliderLabels.slice();
       }
     },
+    
+    labelDesc() {
+      // Use the classes
+      if (this.labelOptions)
+        return this.selectedOption
+      
+    }
   },
   mounted() {
     // Listen for space bar
