@@ -2,6 +2,7 @@ ALL_TASKS["slash"] = {
   desc: "slice horizontally to defend against dots",
   
   classifierOptions: ["🗡", "🛡", "🙃"],
+  // sliderCount: 5,
   
   modelDetails: {
       model: "model/model.json",

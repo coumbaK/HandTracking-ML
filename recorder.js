@@ -122,7 +122,7 @@ class Recorder {
 //===================================================
 // Vue widget
 Vue.component("data-recorder", {
-  template: `<div>
+  template: `<div style="display:flex;flex-direction:row;">
           
     <div>
     
@@ -140,33 +140,34 @@ Vue.component("data-recorder", {
     </div>
 
     <div>
-      <!-- Labels for this data --> 
-      <!-- Options or sliders? --> 
-      
-      <div v-if="labelOptions" >
-        Class: <select v-model="selectedOption">
-          <option v-for="option in labelOptions">{{option}}</option>
-        </select>
-      </div>
-      
-      <table>
-        <tr v-for="">
-      </table>
+      <div style="display:flex;flex-direction:row;border:1px solid black">
+        <!-- Labels for this data --> 
+        <!-- Options or sliders? --> 
 
+        <div v-if="labelOptions" >
+          Class: <select v-model="selectedOption">
+            <option v-for="option in labelOptions">{{option}}</option>
+          </select>
+        </div>
+
+        <!-- sliders -->
+        <table>
+          <tr v-for="(val, index) in sliderData"> 
+            <td style="width:40px;text-align:right">
+              {{val}}
+            </td>
+            <td>
+              <input min=0 max=1 step=.02 type="range" v-model="sliderData[index]"/>
+            </td>
+          </tr>
+        </table>
+      </div>
       <div class="callout">
         <span class="label">Current label:</span><span class="value">{{label}}</span>
       </div>
-
     </div>
 
-    <div>
-      <button  
-        :class="{active:recorder.isRecording}" 
-        @click="recorder.toggleRecording">⏺</button>
-      <div v-if="recorder.isRecording" class="callout">
-        Frames: {{recorder.frameCount}}
-      </div>
-    </div>
+   
 
 
 
@@ -203,6 +204,7 @@ Vue.component("data-recorder", {
   data() {
    
     return {
+      
       selectedOption: this.labelOptions[0],
       recorder: RECORDER,
       recordings: RECORDER.recordings,
@@ -210,5 +212,5 @@ Vue.component("data-recorder", {
     };
   },
 
-  props: ["labelOptions"],
+  props: ["labelOptions", "sliderData"],
 });

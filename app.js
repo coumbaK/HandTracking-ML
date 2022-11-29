@@ -46,7 +46,7 @@ window.addEventListener("load", function () {
            <select v-model="selectedTaskID">
              <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
            </select>
-            <data-recorder :labelOptions="task.classifierOptions" />
+            <data-recorder :sliderData="sliderData" :labelOptions="task.classifierOptions" />
          </div>
          
      
@@ -277,7 +277,9 @@ window.addEventListener("load", function () {
 
     data() {
       return {
-     
+         
+        sliderData: new Array(5).fill(.5),
+        
         allTasks: ALL_TASKS,
         selectedTaskID: Object.keys(ALL_TASKS)[0],
 
