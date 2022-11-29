@@ -17,42 +17,60 @@ console.log("Create face and hands");
 const face = new Face();
 const hands = [new Hand(), new Hand()];
 
-class Recording {
-  constructor({data, label, labelDesc}) {
-     this.data = data || {
-       timestamp: Date.now(),
-       frames: [],
-       label: label,
-       labelDesc: labelDesc
-     }
+class Recorder {
+  constructor() {
+    this.isRecording = false;
   }
-  
- 
+
+  startRecording(label, labelDesc) {
+    
+    // Begin recording data
+    this.data = {
+      timestamp: Date.now(),
+      frames: [],
+      label: label,
+      labelDesc: labelDesc,
+    };
+    this.isRecording = true;
+  }
+
   recordFrame(face, hands) {
-    let frame = {}
+    // Record a frame of hands and face data
+    let frame = {};
     if (face.isActive) {
-      frame.face = face.toFrame()
+      frame.face = face.toFrame();
     }
-    
+
     hands.forEach((hand, handIndex) => {
-      if (!frame.hands)
-        frame.hands = []
-      frame.hands.push(hand.toFrame())
-    })
-    
-    this.data.frames.push(frame)
+      if (!frame.hands) frame.hands = [];
+      frame.hands.push(hand.toFrame());
+    });
+
+    this.data.frames.push(frame);
   }
-  
+
+  stopRecording() {
+    let data = this.data;
+    this.isRecording = false;
+    this.data = undefined;
+    return data;
+  }
+}
+class Playback {
+  constructor() {
+    this.index = 0;
+  }
+
   playbackFrame(face, hands) {
-    this.frameIndex = (this.frameIndex +1)%this.frames.length
-    
-    let frame = this.frames[this.frameIndex]
-    if (frame.face) 
-      face.fromRecord(frame.face)
-     if (frame.hands)  {
-       frame.hands.forEach((data, handIndex) => hands[handIndex].fromRecord(data))
-     }
-      
+    this.frameIndex = (this.frameIndex + 1) % this.frames.length;
+
+    let frame = this.frames[this.frameIndex];
+    if (frame.face) face.fromRecord(frame.face);
+    if (frame.hands) {
+      frame.hands.forEach((data, handIndex) =>
+        hands[handIndex].fromRecord(data)
+      );
+    }
   }
 }
 
@@ -103,22 +121,22 @@ window.addEventListener("load", function () {
         
     
     </div>`,
-    
+
     methods: {
       toggleRecording() {
-        if (!this.isRecording) {
-          console.log("START RECORDING")
-          this.currentRecording = new Recording()
-          
+        if (!this.recording || this.recording.isPlaying) {
+          console.log("START RECORDING");
+          this.recording = new Recording({ label: this.label });
+        } else {
+          this.recordings.append(this.recording.data);
         }
-      }
+      },
     },
-    
-    // Events: 
+
+    // Events:
     // Every draw frame, advance the playback
     // Every hf frame, record the data
     computed: {
-      
       label() {
         // What is the current label of this training data?
         if (this.task.classifierOptions) {
@@ -148,15 +166,12 @@ window.addEventListener("load", function () {
       if (data) recordings = JSON.parse(data);
 
       return {
-        playbackRec: recordings[0],
-        playbackFrameCount: undefined,
-        currentRecording: undefined,
-        isRecording: false,
+        
         recordings: recordings,
       };
     },
-    
-    props: ["task"]
+
+    props: ["task"],
   });
 
   new Vue({
@@ -189,24 +204,19 @@ window.addEventListener("load", function () {
       task() {
         return this.allTasks[this.selectedTaskID];
       },
-
-     
-
     },
 
-    watch: { 
+    watch: {
       recordFace() {
-        this.updateHandsfree()
+        this.updateHandsfree();
       },
 
       recordHands() {
-       this.updateHandsfree()
+        this.updateHandsfree();
       },
     },
-    
-    mounted() {
-      
 
+    mounted() {
       // Create P5 when we mount this element
       const s = (p0) => {
         p = p0;
@@ -223,8 +233,8 @@ window.addEventListener("load", function () {
         p.draw = () => {
           p.clear();
 
-          // Draw stuff          
-          
+          // Draw stuff
+
           // Playback a recording
         };
 
@@ -294,14 +304,13 @@ window.addEventListener("load", function () {
     },
 
     methods: {
-      
       updateHandsfree() {
         this.handsfree.update({
           facemesh: this.trackFace,
           hands: this.trackHands,
         });
       },
-      
+
       createModel() {
         this.nn = ml5.neuralNetwork({
           task: "classification",
