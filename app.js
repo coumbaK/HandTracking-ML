@@ -17,84 +17,6 @@ console.log("Create face and hands");
 const face = new Face();
 const hands = [new Hand(), new Hand()];
 
-class Recorder {
-  constructor() {
-    this.isRecording = false;
-    this.isPlaying = false
-  }
-
-  startRecording(label, labelDesc) {
-    // Begin recording data
-    this.data = {
-      timestamp: Date.now(),
-      frames: [],
-      label: label,
-      labelDesc: labelDesc,
-    };
-    this.isRecording = true;
-  }
-
-  recordFrame(face, hands) {
-    // Record a frame of hands and face data
-    let frame = {};
-    if (face.isActive) {
-      frame.face = face.toFrame();
-    }
-
-    hands.forEach((hand, handIndex) => {
-      if (!frame.hands) frame.hands = [];
-      frame.hands.push(hand.toFrame());
-    });
-
-    this.data.frames.push(frame);
-  }
-  
-  get frameCount() {
-    return this.data?.frames.length
-  }
-
-  stopRecording() {
-    let data = this.data;
-    this.isRecording = false;
-    this.data = undefined;
-
-    return data;
-  }
-  
-  startPlayback(recording) {
-    if (this.isRecording) {
-      console.warn("Cannot playback when recording")
-      return
-    }
-    this.data = recording
-    this.playbackIndex = 0
-    this.isPlaying = true
-  }
-  
-  playbackFrame(face, hands) {
-    
-    // Increment counter
-    this.playbackIndex = (this.playbackIndex + 1) % this.data.frames.length;
-  
-    // Get the frame
-    let frame = this.data.frames[this.playbackIndex];
-    
-    // Set the hands and face to this frame
-    if (frame.face) face.fromRecord(frame.face);
-    if (frame.hands) {
-      frame.hands.forEach((data, handIndex) =>
-        hands[handIndex].fromRecord(data)
-      );
-    }
-  }
-  
-  stopPlayback() {
-    this.data = undefined
-    this.isPlaying = false
-  }
-  
-}
-
 
 const RECORDER = new Recorder();
 
@@ -110,95 +32,6 @@ window.addEventListener("load", function () {
   // otherwise the Vector2d extention-of-arrays
   // and the Vue extension of datatypes will fight
 
-  Vue.component("data-recorder", {
-    template: `<div>
-          
-         <div>
-           <select v-model="selectedRecording">
-             <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toLocaleTimeString()}}</option>
-           </select>
-          <button :class="{active:recorder.isRecording}" @click="recorder.togglePlayback(selectedRecording)">⏯</button>
-         <button @click="recorder.deleteRecording(selectedRecording)">🗑</button> 
-            <div v-if="isRecording">Frames: {{recorder.frameCount}}</div>
-       </div>
-         
-         <div>
-           <!-- Label for this data --> 
-           <div v-if="classifierOptions" >
-             <select v-model="selectedOption">
-               <option v-for="option in classifierOptions">{{option}}</option>
-             </select>
-             
-            
-           </div>
-           
-            <div class="callout">
-             <span class="label">Current label:</span><span class="value">{{label}}</span>
-           </div>
-          
-         </div>
-         
-        <div>
-        <button :class="{active:recorder.isRecording}" @click="recorder.toggleRecording">⏺</button>
-        <div v-if="isRecording">Frames: {{recorder.frameCount}}</div>
-        </div>
-        
-        
-    
-    </div>`,
-
-    methods: {
-     
-
-      saveRecordings() {
-        let data = JSON.stringify(this.recordings, function (key, val) {
-          return val.toFixed ? Number(val.toFixed(3)) : val;
-        });
-      },
-    },
-
-    // Events:
-    // Every draw frame, advance the playback
-    // Every hf frame, record the data
-    computed: {
-      label() {
-        // What is the current label of this training data?
-        if (this.task.classifierOptions) {
-          let options = this.task.classifierOptions;
-          // The label is a one-hot of the classifier
-          let index = options.indexOf(this.selectedOption);
-          let oneHotLabel = oneHot(options.length, index);
-
-          return oneHotLabel;
-        } else {
-          return this.sliderLabels.slice();
-        }
-      },
-    },
-    mounted() {
-      // Listen for space bar
-      document.body.onkeyup = (e) => {
-        if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
-          this.toggleRecording();
-        }
-      };
-    },
-    data() {
-      // Load recordings
-      let data = localStorage.getItem("recordings");
-      let recordings = [];
-      if (data) recordings = JSON.parse(data);
-
-      return {
-        playback: PLAYBACK,
-        recorder: RECORDER,
-        recordings: recordings,
-        selectedRecording: recordings[0],
-      };
-    },
-
-    props: ["task"],
-  });
 
   new Vue({
     template: `<div id="app">
@@ -213,7 +46,7 @@ window.addEventListener("load", function () {
            <select v-model="selectedTaskID">
              <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
            </select>
-            <data-recorder :task="task" />
+            <data-recorder :labelOptions="task.classifierOptions" />
          </div>
          
      
@@ -323,8 +156,8 @@ window.addEventListener("load", function () {
           }
         },
       });
-      this.createModel();
-      this.loadModel();
+      // this.createModel();
+      // this.loadModel();
 
       // this.train();
     },
@@ -444,14 +277,12 @@ window.addEventListener("load", function () {
 
     data() {
       return {
-        classifierOptions: ["🗡", "🛡", "🙃"],
-        selectedOption: "🗡",
-
+     
         allTasks: ALL_TASKS,
         selectedTaskID: Object.keys(ALL_TASKS)[0],
 
         // Recording
-        isRecording: true,
+       
         trackHands: true,
         trackFace: false,
       };
