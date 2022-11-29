@@ -1,6 +1,6 @@
 let handsfree = undefined;
 function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
-  console.log("---- Init handsfree ----");
+  console.log("HANDSFREE - initialize");
   let frameCount = 0;
 
   // From the handsfree demos (mostly)
@@ -12,8 +12,8 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
 
   // Let's create a plugin called "logger" to console.log the data
   handsfree.use("logger", (data) => {
-   
-    frameCount++
+    console.log("HANDSFREE - logger started");
+    frameCount++;
 
     const el = document.getElementsByClassName("handsfree-debugger")[0];
     const videoEl = document.getElementById("handsfree-canvas-video-1");
@@ -28,7 +28,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
     if (!data.hands) return;
 
     let xScale = handsfree.aspectRatio / (p.width / p.height);
-    
+
     let settings = {
       aspectRatio: handsfree.aspectRatio,
       scale: p.width,
@@ -47,7 +47,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
       // console.log("update face")
       // Copy over all of the face data
       // console.log(faceMeshData)
-      
+
       face.setTo(faceMeshData, settings);
     }
 
@@ -69,6 +69,6 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
 
   // Start webcam and tracking (personally, I always like to ask first)
   handsfree.start();
-  console.log("STARTED HANDSFREE");
+  console.log("HANDSFREE - started, waiting...");
   return handsfree;
 }

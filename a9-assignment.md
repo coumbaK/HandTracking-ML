@@ -1,5 +1,13 @@
 # Hand-Tracking ML
 
+* Create new task  
+  * add it to the HTML
+* 
+
+What "task" are we training this network on?
+
+Handsfree 
+
 sequence (or single frame) of hand tracking
 
 Marie Petit style: find new in the latent space
