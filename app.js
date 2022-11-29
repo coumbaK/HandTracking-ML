@@ -18,19 +18,41 @@ const face = new Face();
 const hands = [new Hand(), new Hand()];
 
 class Recording {
-  constructor(data) {
-    this.label = data?.label
-    this.labelDesc = data?.labelDesc
-    this.frames = data?.frames
-    this.timestamp = data?.timestamp
+  constructor({data, label, labelDesc}) {
+     this.data = data || {
+       timestamp: Date.now(),
+       frames: [],
+       label: label,
+       labelDesc: labelDesc
+     }
   }
   
+ 
   recordFrame(face, hands) {
+    let frame = {}
+    if (face.isActive) {
+      frame.face = face.toFrame()
+    }
     
+    hands.forEach((hand, handIndex) => {
+      if (!frame.hands)
+        frame.hands = []
+      frame.hands.push(hand.toFrame())
+    })
+    
+    this.data.frames.push(frame)
   }
   
-  play(face, hands) {
+  playbackFrame(face, hands) {
+    this.frameIndex = (this.frameIndex +1)%this.frames.length
     
+    let frame = this.frames[this.frameIndex]
+    if (frame.face) 
+      face.fromRecord(frame.face)
+     if (frame.hands)  {
+       frame.hands.forEach((data, handIndex) => hands[handIndex].fromRecord(data))
+     }
+      
   }
 }
 
@@ -81,6 +103,16 @@ window.addEventListener("load", function () {
         
     
     </div>`,
+    
+    methods: {
+      toggleRecording() {
+        if (!this.isRecording) {
+          console.log("START RECORDING")
+          this.currentRecording = new Recording()
+          
+        }
+      }
+    },
     
     // Events: 
     // Every draw frame, advance the playback

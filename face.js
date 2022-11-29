@@ -5,27 +5,27 @@ class Trackable {
     this.isActive = false;
     this.points = [];
   }
-  toRecord() {
-    return this.points.map((pt) => pt.slice(0, 2));
+
+  toFrame() {
+    if (this.isActive) return this.points.map((pt) => pt.slice(0, 2));
   }
 
-  fromRecord(record) {
-    
-    if (record) {
+  fromFrame(framePts) {
+    if (framePts) {
+      // Mark this as active,
+      // and set all the points to these points
       this.isActive = true;
-      record.forEach((pt1, index) => {
+      framePts.forEach((pt1, index) => {
         this.points[index].setTo(pt1);
-        // if (index == 10)
-          // console.log(pt1)
       });
       this.postSet();
     } else this.isActive = false;
   }
 
   toData() {
-    return this.points.flat()
+    return this.points.flat();
   }
-  
+
   postSet() {}
 
   setTo(predictedPts, settings) {
