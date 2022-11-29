@@ -17,6 +17,23 @@ console.log("Create face and hands");
 const face = new Face();
 const hands = [new Hand(), new Hand()];
 
+class Recording {
+  constructor(data) {
+    this.label = data?.label
+    this.labelDesc = data?.labelDesc
+    this.frames = data?.frames
+    this.timestamp = data?.timestamp
+  }
+  
+  recordFrame(face, hands) {
+    
+  }
+  
+  play(face, hands) {
+    
+  }
+}
+
 window.addEventListener("load", function () {
   //------------------------------------------------------
   //------------------------------------------------------
@@ -64,6 +81,26 @@ window.addEventListener("load", function () {
         
     
     </div>`,
+    
+    // Events: 
+    // Every draw frame, advance the playback
+    // Every hf frame, record the data
+    computed: {
+      
+      label() {
+        // What is the current label of this training data?
+        if (this.task.classifierOptions) {
+          let options = this.task.classifierOptions;
+          // The label is a one-hot of the classifier
+          let index = options.indexOf(this.selectedOption);
+          let oneHotLabel = oneHot(options.length, index);
+
+          return oneHotLabel;
+        } else {
+          return this.sliderLabels.slice();
+        }
+      },
+    },
     mounted() {
       // Listen for space bar
       document.body.onkeyup = (e) => {
@@ -86,6 +123,8 @@ window.addEventListener("load", function () {
         recordings: recordings,
       };
     },
+    
+    props: ["task"]
   });
 
   new Vue({
@@ -101,7 +140,7 @@ window.addEventListener("load", function () {
            <select v-model="selectedTaskID">
              <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
            </select>
-            <data-recorder />
+            <data-recorder :task="task" />
          </div>
          
      
@@ -119,26 +158,8 @@ window.addEventListener("load", function () {
         return this.allTasks[this.selectedTaskID];
       },
 
-      inactiveVideoElement() {
-        return !this.webcamMode ? this.webcam.elt : this.$refs.video;
-      },
-      activeVideoElement() {
-        return this.webcamMode ? this.webcam.elt : this.$refs.video;
-      },
+     
 
-      label() {
-        // What is the current label of this training data?
-        if (this.task.classifierOptions) {
-          let options = this.task.classifierOptions;
-          // The label is a one-hot of the classifier
-          let index = options.indexOf(this.selectedOption);
-          let oneHotLabel = oneHot(options.length, index);
-
-          return oneHotLabel;
-        } else {
-          return this.sliderLabels.slice();
-        }
-      },
     },
 
     watch: { 
@@ -170,28 +191,9 @@ window.addEventListener("load", function () {
         p.draw = () => {
           p.clear();
 
-          hands.forEach((h) => h.draw(p));
-          p.fill(100);
-          hands.forEach((h) => {
-            h.points.forEach((pt) => {
-              p.textSize(30);
-              p.text(h.label, ...pt);
-            });
-          });
-
-          if (face.isActive) face.drawDebug(p);
-
-          if (this.playbackFrameCount !== undefined) {
-            console.log("PLAYBACK START", this.playbackFrameCount);
-            this.playbackFrameCount += 1;
-            let index =
-              this.playbackFrameCount % this.playbackRec.frames.length;
-            let frame = this.playbackRec.frames[index];
-
-            hands.forEach((hand, handIndex) => {
-              hand.fromRecord(frame.hands[handIndex]);
-            });
-          }
+          // Draw stuff          
+          
+          // Playback a recording
         };
 
         p.mouseClicked = () => {
