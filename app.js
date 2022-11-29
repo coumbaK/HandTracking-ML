@@ -20,10 +20,10 @@ const hands = [new Hand(), new Hand()];
 class Recorder {
   constructor() {
     this.isRecording = false;
+    this.isPlaying = false
   }
 
   startRecording(label, labelDesc) {
-    
     // Begin recording data
     this.data = {
       timestamp: Date.now(),
@@ -48,23 +48,38 @@ class Recorder {
 
     this.data.frames.push(frame);
   }
+  
+  get frameCount() {
+    return this.data?.frames.length
+  }
 
   stopRecording() {
     let data = this.data;
     this.isRecording = false;
     this.data = undefined;
+
     return data;
   }
-}
-class Playback {
-  constructor() {
-    this.index = 0;
+  
+  startPlayback(recording) {
+    if (this.isRecording) {
+      console.warn("Cannot playback when recording")
+      return
+    }
+    this.data = recording
+    this.playbackIndex = 0
+    this.isPlaying = true
   }
-
+  
   playbackFrame(face, hands) {
-    this.frameIndex = (this.frameIndex + 1) % this.frames.length;
-
-    let frame = this.frames[this.frameIndex];
+    
+    // Increment counter
+    this.playbackIndex = (this.playbackIndex + 1) % this.data.frames.length;
+  
+    // Get the frame
+    let frame = this.data.frames[this.playbackIndex];
+    
+    // Set the hands and face to this frame
     if (frame.face) face.fromRecord(frame.face);
     if (frame.hands) {
       frame.hands.forEach((data, handIndex) =>
@@ -72,7 +87,16 @@ class Playback {
       );
     }
   }
+  
+  stopPlayback() {
+    this.data = undefined
+    this.isPlaying = false
+  }
+  
 }
+
+
+const RECORDER = new Recorder();
 
 window.addEventListener("load", function () {
   //------------------------------------------------------
@@ -90,12 +114,13 @@ window.addEventListener("load", function () {
     template: `<div>
           
          <div>
-           <select v-model="playbackRec">
+           <select v-model="selectedRecording">
              <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toLocaleTimeString()}}</option>
            </select>
-           <button @click="togglePlayback">▶️</button> 
-           <button @click="togglePlayback">🗑</button> 
-         </div>
+          <button :class="{active:recorder.isRecording}" @click="recorder.togglePlayback(selectedRecording)">⏯</button>
+         <button @click="recorder.deleteRecording(selectedRecording)">🗑</button> 
+            <div v-if="isRecording">Frames: {{recorder.frameCount}}</div>
+       </div>
          
          <div>
            <!-- Label for this data --> 
@@ -114,8 +139,8 @@ window.addEventListener("load", function () {
          </div>
          
         <div>
-        <button :class="{active:isRecording}" @click="toggleRecording">⏺</button>
-        <div v-if="isRecording">Frames: {{currentRecording.frames.length}}</div>
+        <button :class="{active:recorder.isRecording}" @click="recorder.toggleRecording">⏺</button>
+        <div v-if="isRecording">Frames: {{recorder.frameCount}}</div>
         </div>
         
         
@@ -123,13 +148,12 @@ window.addEventListener("load", function () {
     </div>`,
 
     methods: {
-      toggleRecording() {
-        if (!this.recording || this.recording.isPlaying) {
-          console.log("START RECORDING");
-          this.recording = new Recording({ label: this.label });
-        } else {
-          this.recordings.append(this.recording.data);
-        }
+     
+
+      saveRecordings() {
+        let data = JSON.stringify(this.recordings, function (key, val) {
+          return val.toFixed ? Number(val.toFixed(3)) : val;
+        });
       },
     },
 
@@ -166,8 +190,10 @@ window.addEventListener("load", function () {
       if (data) recordings = JSON.parse(data);
 
       return {
-        
+        playback: PLAYBACK,
+        recorder: RECORDER,
         recordings: recordings,
+        selectedRecording: recordings[0],
       };
     },
 
