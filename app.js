@@ -115,8 +115,8 @@ window.addEventListener("load", function () {
         face,
         hands,
         p,
-        detectHands: this.recordHands,
-        detectFace: this.recordFace,
+        detectHands: this.trackHands,
+        detectFace: this.trackFace,
         onFrame: (frameCount) => {
           // A frame happened! Record it?
           if (this.isRecording) {
@@ -139,19 +139,22 @@ window.addEventListener("load", function () {
           // Make a precition?
           // console.log(frameCount)
           if (frameCount % 10 == 0) {
+            
+            
             let data = hands.map((hand) => hand.toData());
             data.forEach((handData, hIndex) => {
-              if (handData) {
-                // console.log("Predict on ", handData.length)
-                this.nn.predict(handData, (error, prediction) => {
-                  let index = indexOfMax(prediction.map((s) => s.value));
+//               if (handData) {
+//                 // console.log("Predict on ", handData.length)
+                
+//                 this.nn.predict(handData, (error, prediction) => {
+//                   let index = indexOfMax(prediction.map((s) => s.value));
 
-                  let label = this.classifierOptions[index];
-                  console.log("Predicted", label);
+//                   let label = this.classifierOptions[index];
+//                   console.log("Predicted", label);
 
-                  hands[hIndex].label = label;
-                });
-              }
+//                   hands[hIndex].label = label;
+//                 });
+//               }
             });
           }
         },
@@ -164,6 +167,7 @@ window.addEventListener("load", function () {
 
     methods: {
       updateHandsfree() {
+        console.log("Update tracking settings", this.trackFace, this.trackHands)
         this.handsfree.update({
           facemesh: this.trackFace,
           hands: this.trackHands,

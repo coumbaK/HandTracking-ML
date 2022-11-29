@@ -1,6 +1,6 @@
 let handsfree = undefined;
 function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
-  console.log("HANDSFREE - initialize");
+  console.log(`HANDSFREE - initialize, hands:${detectHands} face:${detectFace}`);
   let frameCount = 0;
 
   // From the handsfree demos (mostly)
