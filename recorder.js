@@ -2,8 +2,31 @@ class Recorder {
   constructor() {
     this.isRecording = false;
     this.isPlaying = false;
-  }
+    
+     // Load recordings
+    let data = localStorage.getItem("recordings");
+    this.recordings = [];
+    if (data) this.recordings = JSON.parse(data);
+    
 
+  }
+  
+  saveRecordings() {
+    let data = JSON.stringify(this.recordings, function (key, val) {
+        return val.toFixed ? Number(val.toFixed(3)) : val;
+      });
+    localStorage.setItem("recordings", data);
+  }
+  // ====================================
+  // Recording
+
+   toggleRecording(recording) {
+    if (this.isRecording)
+      this.stopRecording()
+    else 
+      this.startRecording(recording)
+  }
+  
   startRecording(label, labelDesc) {
     // Begin recording data
     this.data = {
@@ -34,7 +57,6 @@ class Recorder {
     return this.data?.frames.length;
   }
 
-  
   stopRecording() {
     let data = this.data;
     this.isRecording = false;
@@ -42,7 +64,27 @@ class Recorder {
 
     return data;
   }
+  
+  deleteRecording(recording) {
+    console.log("Deleted", 
+        recording.label, 
+        recording.labelDesc, 
+        new Date(recording.timestamp).toLocaleTimeString())
+    
+    let index = this.recordings.indexOf(recording)
+    this.recordings.splice(index, 1)
+    this.saveRecordings()
+  }
 
+  // ====================================
+  // Playback
+  togglePlayback(recording) {
+    if (this.isPlaying)
+      this.stopPlayback()
+    else 
+      this.startPlayback(recording)
+  }
+  
   startPlayback(recording) {
     if (this.isRecording) {
       console.warn("Cannot playback when recording");
@@ -83,9 +125,13 @@ Vue.component("data-recorder", {
   template: `<div>
           
     <div>
+    
       <select v-model="selectedRecording">
-        <option v-for="rec in recordings" :value="rec">{{rec.labelDesc}} {{new Date(rec.timestamp).toLocaleTimeString()}}</option>
+        <option v-for="rec in recordings" :value="rec">
+          {{rec.labelDesc || rec.label}} {{new Date(rec.timestamp).toLocaleTimeString()}}
+        </option>
       </select>
+      
       <button :class="{active:recorder.isRecording}" @click="recorder.togglePlayback(selectedRecording)">⏯</button>
       <button @click="recorder.deleteRecording(selectedRecording)">🗑</button> 
       <div v-if="recorder.isPlaying" class="callout">
@@ -95,14 +141,17 @@ Vue.component("data-recorder", {
 
     <div>
       <!-- Labels for this data --> 
-      <!-- Options or sliders --> 
+      <!-- Options or sliders? --> 
       
       <div v-if="labelOptions" >
-      Class: <select v-model="selectedOption">
-        <option v-for="option in labelOptions">{{option}}</option>
-      </select>
-
+        Class: <select v-model="selectedOption">
+          <option v-for="option in labelOptions">{{option}}</option>
+        </select>
       </div>
+      
+      <table>
+        <tr v-for="">
+      </table>
 
       <div class="callout">
         <span class="label">Current label:</span><span class="value">{{label}}</span>
@@ -123,13 +172,7 @@ Vue.component("data-recorder", {
 
     </div>`,
 
-  methods: {
-    saveRecordings() {
-      let data = JSON.stringify(this.recordings, function (key, val) {
-        return val.toFixed ? Number(val.toFixed(3)) : val;
-      });
-    },
-  },
+ 
 
   // Events:
   // Every draw frame, advance the playback
@@ -158,16 +201,12 @@ Vue.component("data-recorder", {
     };
   },
   data() {
-    // Load recordings
-    let data = localStorage.getItem("recordings");
-    let recordings = [];
-    if (data) recordings = JSON.parse(data);
-
+   
     return {
       selectedOption: this.labelOptions[0],
       recorder: RECORDER,
       recordings: RECORDER.recordings,
-      selectedRecording: recordings[0],
+      selectedRecording: RECORDER.recordings[0],
     };
   },
 
