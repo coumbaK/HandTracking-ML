@@ -20,7 +20,7 @@ class Recorder {
   // ====================================
   // Recording
 
-   toggleRecording(recording) {
+  toggleRecording(recording) {
     if (this.isRecording)
       this.stopRecording()
     else 
@@ -123,20 +123,28 @@ class Recorder {
 // Vue widget
 Vue.component("data-recorder", {
   template: `<div style="display:flex;flex-direction:row;">
-          
-    <div>
-    
-      <select v-model="selectedRecording">
-        <option v-for="rec in recordings" :value="rec">
-          {{rec.labelDesc || rec.label}} {{new Date(rec.timestamp).toLocaleTimeString()}}
-        </option>
-      </select>
-      
-      <button :class="{active:recorder.isRecording}" @click="recorder.togglePlayback(selectedRecording)">⏯</button>
-      <button @click="recorder.deleteRecording(selectedRecording)">🗑</button> 
-      <div v-if="recorder.isPlaying" class="callout">
-       {{recorder.playbackFrame}}/{{recorder.frameCount}}
+    <div> 
+      <div>
+
+        <select v-model="selectedRecording">
+          <option v-for="rec in recordings" :value="rec">
+            {{rec.labelDesc || rec.label}} {{new Date(rec.timestamp).toLocaleTimeString()}}
+          </option>
+        </select>
+
+        <button :class="{active:recorder.isRecording}" @click="recorder.togglePlayback(selectedRecording)">⏯</button>
+        <button @click="recorder.deleteRecording(selectedRecording)">🗑</button> 
+        
+        <button  
+          :class="{active:recorder.isRecording}" 
+          @click="recorder.toggleRecording()">⏺</button>
+        
+        <div v-if="recorder.isPlaying || recorder.isRecording" class="callout">
+         <span v-if="recorder.isPlaying">{{recorder.playbackFrame}}/ </span>{{recorder.frameCount}}
+        </div>
       </div>
+
+      
     </div>
 
     <div>
