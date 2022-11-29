@@ -12,7 +12,7 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
 
   // Let's create a plugin called "logger" to console.log the data
   handsfree.use("logger", (data) => {
-    console.log("HANDSFREE - logger started");
+    
     frameCount++;
 
     const el = document.getElementsByClassName("handsfree-debugger")[0];

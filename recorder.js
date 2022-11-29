@@ -12,8 +12,9 @@ class Recorder {
   }
   
   saveRecordings() {
+    console.log("Save recordings", this.recordings)
     let data = JSON.stringify(this.recordings, function (key, val) {
-        return val.toFixed ? Number(val.toFixed(3)) : val;
+        return val?.toFixed ? Number(val.toFixed(3)) : val;
       });
     localStorage.setItem("recordings", data);
   }
@@ -28,6 +29,7 @@ class Recorder {
   }
   
   startRecording(label, labelDesc) {
+    console.log("RECORDER - start recording")
     // Begin recording data
     this.data = {
       timestamp: Date.now(),
@@ -39,6 +41,7 @@ class Recorder {
   }
 
   recordFrame(face, hands) {
+    console.log("RECORDER - record frame")
     // Record a frame of hands and face data
     let frame = {};
     if (face.isActive) {
@@ -58,9 +61,15 @@ class Recorder {
   }
 
   stopRecording() {
+    console.log("RECORDER - stop recording")
+    
     let data = this.data;
+    this.recordings.push(data)
+    this.saveRecordings()
+    
     this.isRecording = false;
     this.data = undefined;
+  
 
     return data;
   }
@@ -126,24 +135,33 @@ Vue.component("data-recorder", {
     <div> 
       <div>
 
-        <select v-model="selectedRecording">
+        <select v-model="selectedRecording" style="width:150px;">
           <option v-for="rec in recordings" :value="rec">
             {{rec.labelDesc || rec.label}} {{new Date(rec.timestamp).toLocaleTimeString()}}
           </option>
         </select>
+        
+        <div>
+          <button :class="{active:recorder.isPlaying}" 
+            @click="recorder.togglePlayback(selectedRecording)">
+            ⏯
+          </button>
+          
+          <button 
+            @click="recorder.deleteRecording(selectedRecording)">
+            🗑
+          </button> 
 
-        <button :class="{active:recorder.isRecording}" @click="recorder.togglePlayback(selectedRecording)">⏯</button>
-        <button @click="recorder.deleteRecording(selectedRecording)">🗑</button> 
-        
-        <button  
-          :class="{active:recorder.isRecording}" 
-          @click="recorder.toggleRecording()">⏺</button>
-        
-        <div v-if="recorder.isPlaying || recorder.isRecording" class="callout">
-         <span v-if="recorder.isPlaying">{{recorder.playbackFrame}}/ </span>{{recorder.frameCount}}
+          <button  
+            :class="{active:recorder.isRecording}" 
+            @click="recorder.toggleRecording()">
+            ⏺
+          </button>
         </div>
       </div>
-
+      <div v-if="recorder.isPlaying || recorder.isRecording" class="callout">
+         <span v-if="recorder.isPlaying">{{recorder.playbackFrame}}/ </span>{{recorder.frameCount}} frames
+        </div>
       
     </div>
 

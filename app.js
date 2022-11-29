@@ -119,26 +119,13 @@ window.addEventListener("load", function () {
         detectFace: this.trackFace,
         onFrame: (frameCount) => {
           // A frame happened! Record it?
-          if (this.isRecording) {
-            console.log("record frame");
-
-            // Do we have any data?
-
-            let frame = {};
-            if (this.recordFace) frame.face = face.toRecord();
-            if (this.recordHands) {
-              frame.hands = [];
-              hands.forEach((hand) => {
-                if (hand.isActive) frame.hands.push(hand.toRecord());
-              });
-            }
-
-            this.currentRecording.frames.push(frame);
-          }
+          if (RECORDER.isRecording)
+          RECORDER.recordFrame(face, hands)
 
           // Make a precition?
           // console.log(frameCount)
           if (frameCount % 10 == 0) {
+            // Make a prediction every N frames
             
             
             let data = hands.map((hand) => hand.toData());
