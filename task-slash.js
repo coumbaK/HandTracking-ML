@@ -18,17 +18,27 @@ ALL_TASKS["slash"] = {
     },
   
   setup(p) {
-    this.osc = new p5.Oscillator('triangle');
-    this.osc.start()
-    this.osc.stop()
+    // Do any setup work here
+    // this.osc = new p5.Oscillator('triangle');
+    // this.osc.start()
+    // this.osc.stop()
   },
 
   draw(p, hands, face) {
      // osc.freq(hand.prediction);
     
+    
+    
     hands.forEach(hand => {
-      // hand.points.forEach(pt => p.circle(...pt, 10))
-       hand.points.forEach((pt, index) => p.text(index, ...pt))
+      // Draw each hand
+      if (hand.isActive) {
+      
+        // Test drawing
+        // hand.points.forEach(pt => p.circle(...pt, 10))
+         hand.points.forEach((pt, index) => p.text(index, ...pt))
+        
+        p.circle(...hand.center, 20)
+      }
     })
   },
     

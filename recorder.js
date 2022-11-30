@@ -198,7 +198,7 @@ Vue.component("data-recorder", {
         </div>
 
         <!-- sliders -->
-        <div>
+        <div  v-if="labelOptions === undefined">
           <label for="labelDesc">Landmark name:</label><br>
           <input id="labelDesc" >
           

@@ -68,11 +68,21 @@ class Hand extends Trackable {
     this.center = new Vector2D()
     this.fingers = []
     for (var i = 0; i < 5; i++) {
-      
+      this.fingers[i] = []
+       for (var j = 0; j < 4; j++) {
+          this.fingers[i][j] = this.points[i*4 + 1 + j]
+      }
     }
   }
   
-  postSet() {}
+  postSet() {
+    // Calculate the center
+    this.center.mult(0)
+   this.center.add(this.points[3])
+     this.center.add(this.points[17])
+     this.center.add(this.points[0])
+    this.center.div(3)
+  }
 }
 
 /**
