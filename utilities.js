@@ -105,7 +105,7 @@ function HSLToHex(h, s, l) {
 // ---------------------------
 // Voronoi
 
-let voronoi = new Voronoi();
+// let voronoi = new Voronoi();
 
 function computeVoronoi(bbox, pts) {
   //   Is pts a list of vectors, or a list of lists of vectors?
