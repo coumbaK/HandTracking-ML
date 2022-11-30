@@ -1,61 +1,47 @@
-# A8: Masks
+# A9: Hand Tracking
 
 ## Your name
 Test McStudent
 
 ## Your Glitch link
-[my page](https://galaxykate-a8.glitch.me)
+[my page](https://galaxykate-a9.glitch.me)
 
 
-## Describe your first mask
-
+## Describe the experience you designed
 --your answer here--
 
-## What inspirations (from the in-class materials or elsewhere) did you use for this mask? 
-
---your answer here (even if you ended up somewhere else!)--
-
-
-## How does your mask relate to its background?
-
+## For each hand gesture it responds to, what does it do?
 --your answer here--
 
+## How are you visualizing or changing graphics with the gesture?
+--your answer here--
 
-## What of the Homuncular flexibility terms apply to this mask?  (restoring, replacing, reinventing, ipsimoda remapping, sensory substitution, parasynthetic expression) 
-  
---or cite other ideas from the article that were useful--
-
-
- 
-## How do you feel wearing this mask? 
-
+## What gestures mentioned in the Lingthusiasm podcast are related to your gestures?
 --your answer here--
 
 
-
-## Describe your second mask
-
+## How long did it take to train your network with this Handsfree-handtracking approach?
 --your answer here--
 
-## What inspirations (from the in-class materials or elsewhere) did you use for this mask? 
 
---your answer here (even if you ended up somewhere else!)--
+## Which gestures did it guess wrong and when? What could have improved that training data?
+--your answer here--
 
 
-## How does your mask relate to its background?
+## How long did it take to train the network with the Teachable Machine pixel-based approach?
 
 --your answer here--
 
 
-## What of the Homuncular flexibility terms apply to this mask?  (restoring, replacing, reinventing, ipsimoda remapping, sensory substitution, parasynthetic expression) 
-  
---or cite other ideas from the article that were useful--
 
- 
-## How do you feel wearing this mask? 
+## How did the quality of predictions compare between them?
 
 --your answer here--
 
+
+## How did the quality of predictions on Teachable Machine change when you changed the background or lighting?
+
+--your answer here--
 
 ## List any resources (code, images, etc) you've used, and where you got them from
 

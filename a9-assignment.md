@@ -12,6 +12,8 @@ Our output will either be:
 
 You *definitely* want to watch the class recording where we go over how to do this.
 
+Build an experience that uses the user's hand positions and detected gestures to do *something interesting*
+
 * **Recording and Training**
 * Create new task by cloning task-slash 
   * add it to the HTML
@@ -39,11 +41,15 @@ You *definitely* want to watch the class recording where we go over how to do th
   
 * Finally, do a comparison  
   * Try training the same hand gestures on https://teachablemachine.withgoogle.com/
+  * This trains on the camera's pixels, without converting your hand to hand positions first.
   * Record approximately the same data
   * Train it
-  * 
+  * How long did it take?
+  * How did the accuracy compare?
+  * Change your lighting or turn to a diffent angle.
+  * Does this change the accuracy
   
-As usual, turn in 
+**As usual, turn in**
 * downloaded Glitch code
 * your markdown
 * documentation (a GIF) of your interaction working
