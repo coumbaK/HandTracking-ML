@@ -2,6 +2,7 @@
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 400;
+const SLIDER_COUNT = 5
 let ALL_TASKS = {};
 
 let p = undefined;
@@ -161,6 +162,8 @@ window.addEventListener("load", function () {
       // this.loadModel();
 
       // this.train();
+      
+      this.startTask()
     },
 
     
@@ -168,23 +171,34 @@ window.addEventListener("load", function () {
     methods: {
       
       startTask() {
+        // Run setup code
+        this.task.setup(p, hands, face)
+        
+        let outputLength = this.task.classifierOptions?.length || SLIDER_COUNT
+        let inputLength = HAND_LANDMARK_COUNT * 2
+        console.log(`Creating a network from ${inputLength} input neurons`)
+        console.log(`  to ${outputLength} output neurons`)
+        
+        // Make a new neural net for this task
          this.nn = ml5.neuralNetwork({
           task: "classification",
-          inputs: HAND_LANDMARK_COUNT * 2,
-          outputs: this.classifierOptions.length,
-          outputLabels: this.classifierOptions,
+          inputs: inputLength,
+          outputs: outputLength,
+          outputLabels: this.task.classifierOptions,
           debug: true,
         });
         
         //========
         // Attempt to load the model
         console.log("NeuralNet - load a model!");
-       
+        console.log(" **Don't worry if this 'model.json' fails to load if you haven't created it yet**") 
+      
         this.nn.load(this.task.modelDetails, () => {
           console.log("Model loaded?", this.nn);
           this.nn.hasLoadedModel = true;
         });
-      }
+        
+      },
       
       updateHandsfree() {
         console.log("Update tracking settings", this.trackFace, this.trackHands)
@@ -213,7 +227,6 @@ window.addEventListener("load", function () {
               
               const inputs = hand.flat();
               const outputs = rec.label;
-              console.log(inputs, outputs);
 
               this.nn.addData(inputs, outputs);
             });
@@ -223,7 +236,7 @@ window.addEventListener("load", function () {
 
         // Step 6: train your neural network
         const trainingOptions = {
-          epochs: 20,
+          epochs: this.task.epochCount,
           batchSize: 12,
         };
         this.nn.train(trainingOptions, () => {
@@ -240,7 +253,7 @@ window.addEventListener("load", function () {
     data() {
       return {
          
-        sliderData: new Array(5).fill(.5),
+        sliderData: new Array(SLIDER_COUNT).fill(.5),
         
         allTasks: ALL_TASKS,
         selectedTaskID: Object.keys(ALL_TASKS)[0],

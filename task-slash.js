@@ -1,12 +1,19 @@
 ALL_TASKS["slash"] = {
   desc: "slice horizontally to defend against dots",
   
+  // Add classifier options to do classification, 
+  // or comment out for 5 sliders for continuous values
   classifierOptions: ["🗡", "🛡", "🙃", "👊"],
-  // sliderCount: 5,
+  
+  // How long you want to train for
+  // Find an accuracy that works for you
+  epochCount: 20, 
+  
+  
   
   modelDetails: {
-      model: "model/model.json",
-      metadata: "model/model_meta.json",
+      model: "slash/model.json",
+      metadata: "slash/model_meta.json",
       weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669646418329",
     },
   
