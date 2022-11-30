@@ -83,6 +83,8 @@ window.addEventListener("load", function () {
 
         (p.preload = () => {
           // Any preloading
+          for (let id in ALL_TASKS)
+            ALL_TASKS[id].preload?.(p0)
         }),
           (p.setup = () => {
             p.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);

@@ -16,6 +16,15 @@ ALL_TASKS["slash"] = {
       "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669775994921",
   },
 
+  preload(p) {
+    // Any extra asset loading
+    // free sound effects: https://freesound.org/
+    // Be sure to cite in your .md!
+   
+    
+    this.swordHit = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/536104__eminyildirim__sword-hit-heavy.wav?v=1669823017308');
+  },
+  
   setup(p) {
     // Do any setup work here
     this.osc = new p5.Oscillator('sine');
@@ -36,6 +45,7 @@ ALL_TASKS["slash"] = {
         //    this.osc.stop()
       
       // Play a sound
+      this.swordHit.play()
     }
   },
 
