@@ -1,8 +1,8 @@
-/* globals Vector2D, allMasks, ml5, Vue, Face, Hand,oneHot,  p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p */
+/* globals Vector2D, allMasks, ml5, Vue, Face, Hand,oneHot,  p5, face, hands, CANVAS_WIDTH, CANVAS_HEIGHT, p, indexOfMax, initHandsFree, Recorder */
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 400;
-const SLIDER_COUNT = 5
+const SLIDER_COUNT = 5;
 let ALL_TASKS = {};
 
 let p = undefined;
@@ -18,7 +18,6 @@ console.log("Create face and hands");
 const face = new Face();
 const hands = [new Hand(), new Hand()];
 
-
 const RECORDER = new Recorder();
 
 window.addEventListener("load", function () {
@@ -32,7 +31,6 @@ window.addEventListener("load", function () {
   //   This has to stay outside of Vue,
   // otherwise the Vector2d extention-of-arrays
   // and the Vue extension of datatypes will fight
-
 
   new Vue({
     template: `<div id="app">
@@ -98,11 +96,10 @@ window.addEventListener("load", function () {
           p.clear();
 
           // Draw stuff
-          this.task.draw(p, hands, face)
-            
+          this.task.draw(p, hands, face);
+
           // Playback a recording
-          if (RECORDER.isPlaying)
-            RECORDER.playbackFrame(hands, face)
+          if (RECORDER.isPlaying) RECORDER.playbackFrame(hands, face);
         };
 
         p.mouseClicked = () => {
@@ -127,33 +124,29 @@ window.addEventListener("load", function () {
         detectFace: this.trackFace,
         useHandsFree() {
           // Use the HF data if we aren't playing back data
-          return !RECORDER.isPlaying
+          return !RECORDER.isPlaying;
         },
         onFrame: (frameCount) => {
           // A frame happened! Record it?
-          if (RECORDER.isRecording)
-            RECORDER.recordFrame(face, hands)
+          if (RECORDER.isRecording) RECORDER.recordFrame(face, hands);
 
-          // Make a precition?
-          // console.log(frameCount)
-          if (frameCount % 10 == 0) {
+           
+          else if (frameCount % 10 == 0) {
             // Make a prediction every N frames
-            
-            
-            let data = hands.map((hand) => hand.toData());
-            data.forEach((handData, hIndex) => {
-//               if (handData) {
-//                 // console.log("Predict on ", handData.length)
-                
-//                 this.nn.predict(handData, (error, prediction) => {
-//                   let index = indexOfMax(prediction.map((s) => s.value));
+  
+            hands.forEach((hand, hIndex) => {
+              let handData = hand.toData()
+             if (handData) {
+                  
+                this.nn.predict(handData, (error, prediction) => {
+                  let index = indexOfMax(prediction.map((s) => s.value));
 
-//                   let label = this.classifierOptions[index];
-//                   console.log("Predicted", label);
+                  let label = this.classifierOptions[index];
+                  console.log("Predicted", label);
 
-//                   hands[hIndex].label = label;
-//                 });
-//               }
+                  hands[hIndex].label = label;
+             })
+                                }
             });
           }
         },
@@ -162,69 +155,65 @@ window.addEventListener("load", function () {
       // this.loadModel();
 
       // this.train();
-      
-      this.startTask()
+
+      this.startTask();
     },
 
-    
-    
     methods: {
-      
       startTask() {
         // Run setup code
-        this.task.setup(p, hands, face)
-        
-        let outputLength = this.task.classifierOptions?.length || SLIDER_COUNT
-        let inputLength = HAND_LANDMARK_COUNT * 2
-        console.log(`Creating a network from ${inputLength} input neurons`)
-        console.log(`  to ${outputLength} output neurons`)
-        
+        this.task.setup(p, hands, face);
+
+        let outputLength = this.task.classifierOptions?.length || SLIDER_COUNT;
+        let inputLength = HAND_LANDMARK_COUNT * 2;
+        console.log(
+          `NEURAL NET - Creating a network from ${inputLength} input neurons`
+        );
+        console.log(`  to ${outputLength} output neurons`);
+
         // Make a new neural net for this task
-         this.nn = ml5.neuralNetwork({
+        this.nn = ml5.neuralNetwork({
           task: "classification",
           inputs: inputLength,
           outputs: outputLength,
           outputLabels: this.task.classifierOptions,
           debug: true,
         });
-        
+
         //========
         // Attempt to load the model
-        console.log("NeuralNet - load a model!");
-        console.log(" **Don't worry if this 'model.json' fails to load if you haven't created it yet**") 
-      
+        console.log("NEURAL NET - load a model!");
+        console.log(
+          " **Don't worry if this 'model.json' fails to load if you haven't created it yet**"
+        );
+
         this.nn.load(this.task.modelDetails, () => {
-          console.log("Model loaded?", this.nn);
+          console.log("NEURAL NET - Model loaded!", this.nn);
           this.nn.hasLoadedModel = true;
         });
-        
       },
-      
+
       updateHandsfree() {
-        console.log("Update tracking settings", this.trackFace, this.trackHands)
+        console.log(
+          "Update tracking settings",
+          this.trackFace,
+          this.trackHands
+        );
         this.handsfree.update({
           facemesh: this.trackFace,
           hands: this.trackHands,
         });
       },
 
-     
-
-     
-
       train() {
         console.log("NeuralNet - train!");
-        
 
         RECORDER.recordings.forEach((rec) => {
           console.log("Training on label:", rec.label, rec.labelDesc);
-          console.log(` ${rec.frames.length} frames`)
+          console.log(` ${rec.frames.length} frames`);
           rec.frames.forEach((frame) => {
-            
-
             // Add each hand in the frame as the input data
             frame.hands.forEach((hand) => {
-              
               const inputs = hand.flat();
               const outputs = rec.label;
 
@@ -246,20 +235,17 @@ window.addEventListener("load", function () {
           });
         });
       },
-
-      
     },
 
     data() {
       return {
-         
-        sliderData: new Array(SLIDER_COUNT).fill(.5),
-        
+        sliderData: new Array(SLIDER_COUNT).fill(0.5),
+
         allTasks: ALL_TASKS,
         selectedTaskID: Object.keys(ALL_TASKS)[0],
 
         // Recording
-       
+
         trackHands: true,
         trackFace: false,
       };

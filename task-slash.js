@@ -14,7 +14,7 @@ ALL_TASKS["slash"] = {
   modelDetails: {
       model: "slash/model.json",
       metadata: "slash/model_meta.json",
-      weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669646418329",
+      weights: "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669775994921",
     },
   
   setup(p) {
