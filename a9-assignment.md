@@ -4,7 +4,14 @@
   * add it to the HTML
 * 
 
-What "task" are we training this network on?
+What "task" are we training this network on?  In this assignment, we will train a network that takes a hand position as input and predicts **some label**. Neural networks need to have a fixed number of input neurons, and a fixed number of output neurons.
+
+Our input will be the 42 numbers we get from each hand (each hand has 21 points and each point has an X and Y coordinate)
+
+Our output will either be:
+
+* a "one-hot" encoding of a "class", for example `[0,1,0, 0]` if the label is the second of four options 
+* an array of a fixed length, like 
 
 Handsfree 
 

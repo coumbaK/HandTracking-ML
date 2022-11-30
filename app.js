@@ -45,7 +45,7 @@ window.addEventListener("load", function () {
           <button :class="{active:trackFace}" @click="trackFace=!trackFace">😐</button>
           <button :class="{active:trackHands}" @click="trackHands=!trackHands">🖐</button>
         
-          <button @click="train">
+          <button @click="train">train</button>
         </div>
         
           <div>
@@ -163,7 +163,29 @@ window.addEventListener("load", function () {
       // this.train();
     },
 
+    
+    
     methods: {
+      
+      startTask() {
+         this.nn = ml5.neuralNetwork({
+          task: "classification",
+          inputs: HAND_LANDMARK_COUNT * 2,
+          outputs: this.classifierOptions.length,
+          outputLabels: this.classifierOptions,
+          debug: true,
+        });
+        
+        //========
+        // Attempt to load the model
+        console.log("NeuralNet - load a model!");
+       
+        this.nn.load(this.task.modelDetails, () => {
+          console.log("Model loaded?", this.nn);
+          this.nn.hasLoadedModel = true;
+        });
+      }
+      
       updateHandsfree() {
         console.log("Update tracking settings", this.trackFace, this.trackHands)
         this.handsfree.update({
@@ -172,41 +194,23 @@ window.addEventListener("load", function () {
         });
       },
 
-      createModel() {
-        this.nn = ml5.neuralNetwork({
-          task: "classification",
-          inputs: HAND_LANDMARK_COUNT * 2,
-          outputs: this.classifierOptions.length,
-          outputLabels: this.classifierOptions,
-          debug: true,
-        });
-      },
+     
 
-      loadModel() {
-        const modelDetails = {
-          model: "model/model.json",
-          metadata: "model/model_meta.json",
-
-          weights:
-            // "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669610244323",
-            "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669646418329",
-        };
-        this.nn.load(modelDetails, () => {
-          console.log("Model loaded?", this.nn);
-          this.nn.hasLoadedModel = true;
-        });
-      },
+     
 
       train() {
-        console.log("TRAIN");
+        console.log("NeuralNet - train!");
+        
 
-        this.recordings.forEach((rec) => {
-          console.log(rec.label);
+        RECORDER.recordings.forEach((rec) => {
+          console.log("Training on label:", rec.label, rec.labelDesc);
+          console.log(` ${rec.frames.length} frames`)
           rec.frames.forEach((frame) => {
-            console.log(frame.hands.length);
+            
 
-            // Add this hand as a labeled data
+            // Add each hand in the frame as the input data
             frame.hands.forEach((hand) => {
+              
               const inputs = hand.flat();
               const outputs = rec.label;
               console.log(inputs, outputs);
@@ -230,51 +234,7 @@ window.addEventListener("load", function () {
         });
       },
 
-      setToRecordFrame(frame) {
-        if (frame.hands) {
-          this.hands.forEach((hand, hIndex) =>
-            hand.setToRecord(frame.hands[hIndex])
-          );
-        }
-      },
-
-      togglePlayback() {
-        if (this.playbackFrameCount !== undefined) {
-          console.log("Stop playback", this.playbackRec);
-          this.playbackFrameCount = undefined;
-          this.handsfree.unpause();
-        } else {
-          console.log("Start playback", this.playbackRec);
-          this.playbackFrameCount = 0;
-          this.handsfree.pause();
-        }
-      },
-
-      toggleRecording() {
-        this.isRecording = !this.isRecording;
-        if (this.isRecording) {
-          console.log("START RECORDING");
-
-          this.currentRecording = {
-            label: this.label,
-            labelDesc: this.selectedOption,
-            timestamp: Date.now(),
-            frames: [],
-          };
-        } else {
-          console.log("STOP RECORDING");
-          console.log(this.currentRecording);
-          this.recordings.push(this.currentRecording);
-          this.currentRecording = undefined;
-
-          //           https://stackoverflow.com/questions/9339870/how-to-reduce-numbers-significance-in-jsons-stringify
-          let data = JSON.stringify(this.recordings, function (key, val) {
-            return val.toFixed ? Number(val.toFixed(3)) : val;
-          });
-
-          localStorage.setItem("recordings", data);
-        }
-      },
+      
     },
 
     data() {
