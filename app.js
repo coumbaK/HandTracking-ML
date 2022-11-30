@@ -131,29 +131,35 @@ window.addEventListener("load", function () {
             // Make a prediction every N frames
 
             hands.forEach((hand, hIndex) => {
-              
               // Make a prediction for each hand
               let handData = hand.toData();
               if (handData && hand.isActive) {
                 this.nn.predict(handData, (error, rawPrediction) => {
                   if (error) {
-                    console.warn(error)
+                    console.warn(error);
                   }
-                    
+
                   // Get the argmax
                   let index = indexOfMax(rawPrediction.map((s) => s.value));
-                  
+
                   let prediction = {
                     output: rawPrediction,
-                   label: this.task.classifierOptions[index],
-                    certainty: rawPrediction[index].value
-                }
-                  
-                  // If the 
-                  
-                  // console.log("Predicted hand ", hIndex, prediction.label, prediction.certainty.toFixed(2));
+                    label: this.task.classifierOptions[index],
+                    certainty: rawPrediction[index].value,
+                  };
 
+                  // If the prediction is high certainty and new,
+                  let lastLabel = hands[hIndex].prediction?.label;
                   hands[hIndex].prediction = prediction;
+                  if (lastLabel !== prediction.label) {
+                    this.task.onChangeLabel?.(
+                      hand,
+                      prediction.label,
+                      lastLabel
+                    );
+                  }
+
+                  
                 });
               }
             });

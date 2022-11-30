@@ -22,6 +22,22 @@ ALL_TASKS["slash"] = {
     // this.osc.start()
     // this.osc.stop()
   },
+  
+  onChangeLabel(hand, newLabel, oldLabel) {
+    
+    if (hand.prediction.certainty > .9) {
+    // An event happened!
+    console.log(`Changed from ${oldLabel} to ${newLabel}` )
+    
+      // Make a theremin!
+        //    if (newLabel === "🗡")
+        //    this.osc.start()
+        // if (newLabel === "🛡")
+        //    this.osc.stop()
+      
+      // Play a sound
+    }
+  },
 
   draw(p, hands, face) {
    
@@ -41,8 +57,8 @@ ALL_TASKS["slash"] = {
           p.circle(...fingertip, 20)
         })      
         
-        let pitch = hand.center[1]
-        console.log("Pitch", pitch)
+        let pitch = 400 - hand.center[1]
+        // console.log("Pitch", pitch)
          this.osc.freq(pitch);
         
        
@@ -54,11 +70,7 @@ ALL_TASKS["slash"] = {
           p.textSize(pred.certainty ** 2 * 70);
           p.text(pred.label, ...hand.center);
           
-          
-        //    if (pred.label === "🗡")
-        //    this.osc.start()
-        // if (pred.label === "🛡")
-        //    this.osc.stop()
+         
         }
       }
     });
