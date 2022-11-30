@@ -129,24 +129,32 @@ window.addEventListener("load", function () {
         onFrame: (frameCount) => {
           // A frame happened! Record it?
           if (RECORDER.isRecording) RECORDER.recordFrame(face, hands);
-
-           
           else if (frameCount % 10 == 0) {
             // Make a prediction every N frames
-  
+
             hands.forEach((hand, hIndex) => {
-              let handData = hand.toData()
-             if (handData) {
+              
+              // Make a prediction for each hand
+              let handData = hand.toData();
+              if (handData && hand.isActive) {
+                this.nn.predict(handData, (error, rawPrediction) => {
+                  if (error) {
+                    console.warn(error)
+                  }
+                    
+                  // Get the argmax
+                  let index = indexOfMax(rawPrediction.map((s) => s.value));
                   
-                this.nn.predict(handData, (error, prediction) => {
-                  let index = indexOfMax(prediction.map((s) => s.value));
+                  let prediction = {
+                    output: rawPrediction,
+                   label: this.task.classifierOptions[index],
+                    certainty: rawPrediction[index].value
+                }
+                  console.log("Predicted hand ", hIndex, prediction.label, prediction.certainty.toFixed(2));
 
-                  let label = this.classifierOptions[index];
-                  console.log("Predicted", label);
-
-                  hands[hIndex].label = label;
-             })
-                                }
+                  hands[hIndex].label = prediction;
+                });
+              }
             });
           }
         },
@@ -188,7 +196,7 @@ window.addEventListener("load", function () {
         );
 
         this.nn.load(this.task.modelDetails, () => {
-          console.log("NEURAL NET - Model loaded!", this.nn);
+          console.log("NEURAL NET - Model loaded!");
           this.nn.hasLoadedModel = true;
         });
       },
