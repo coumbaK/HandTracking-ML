@@ -1,5 +1,5 @@
 ALL_TASKS["slash"] = {
-  desc: "slice horizontally to defend against dots",
+  desc: "This does too many things, but is an example of what you could do",
 
   // Add classifier options to do classification,
   // or comment out for 5 sliders for continuous values
@@ -22,7 +22,10 @@ ALL_TASKS["slash"] = {
     // Be sure to cite in your .md!
    
     
-    this.swordHit = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/536104__eminyildirim__sword-hit-heavy.wav?v=1669823017308');
+    this.swordHitSound = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/536104__eminyildirim__sword-hit-heavy.wav?v=1669823017308');
+      this.pianoNote = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/573512__gamedrix974__54.wav?v=1669823019716');
+      this.bubblePopSound = p.loadSound(' https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/376968__elmasmalo1__bubble-pop.wav?v=1669823025748');
+   
   },
   
   setup(p) {
@@ -30,13 +33,18 @@ ALL_TASKS["slash"] = {
     this.osc = new p5.Oscillator('sine');
     // this.osc.start()
     // this.osc.stop()
+    this.color = [100, 100, 80]
+    this.points = 10
   },
   
   onChangeLabel(hand, newLabel, oldLabel) {
-    
-    if (hand.prediction.certainty > .9) {
+   
     // An event happened!
     console.log(`Changed from ${oldLabel} to ${newLabel}` )
+    
+    // Lots of options
+    // Change some state, play a sound,
+    // change some value....
     
       // Make a theremin!
         //    if (newLabel === "🗡")
@@ -45,12 +53,29 @@ ALL_TASKS["slash"] = {
         //    this.osc.stop()
       
       // Play a sound
-      this.swordHit.play()
-    }
+     //  if (newLabel === "🗡")
+     //    this.swordHitSound.play()
+     // else 
+     //   this.bubblePopSound.play()
+    
+    //Play a pitch-shifted sound
+       
+     if (newLabel === "👊"){
+      let pitch = (400 - hand.center[1])*.002 + 1
+       this.pianoNote.play()
+    this.pianoNote.rate(pitch)
+     
+       
+       // Random color? 
+        this.color = [360*Math.random(), 100, 50]
+       this.points++
+     }
+    
+  
   },
 
   draw(p, hands, face) {
-   
+    p.background(...this.color)   
 
     hands.forEach((hand) => {
       // Draw each hand
@@ -82,8 +107,14 @@ ALL_TASKS["slash"] = {
           
          
         }
+        
+        
       }
     });
+    
+    // Show text if you want!
+    p.fill(0)
+    p.text(this.points + " points", 350, 250);
   },
 
   track: "HAND",

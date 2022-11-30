@@ -150,7 +150,7 @@ window.addEventListener("load", function () {
                     certainty: rawPrediction[index].value,
                   };
 
-                  // If the prediction is high certainty and new,
+                  // When we change the prediction
                   let lastLabel = hands[hIndex].prediction?.label;
                   hands[hIndex].prediction = prediction;
                   if (lastLabel !== prediction.label) {
