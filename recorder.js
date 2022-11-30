@@ -7,7 +7,7 @@ class Recorder {
     let data = localStorage.getItem("recordings");
     this.recordings = [];
     if (data) this.recordings = JSON.parse(data);
-    
+    this.data = undefined
 
   }
   
@@ -34,6 +34,8 @@ class Recorder {
   startRecording(label, labelDesc) {
     console.log("RECORDER - start recording")
     // Begin recording data
+    
+    
     this.data = {
       timestamp: Date.now(),
       frames: [],
@@ -71,6 +73,7 @@ class Recorder {
    
     
     this.data.frames.push(frame);
+    console.log("Frame:", this.data.frames.length, this.frameCount)
   }
 
   get frameCount() {
@@ -177,7 +180,7 @@ Vue.component("data-recorder", {
         </div>
       </div>
       <div v-if="recorder.isPlaying || recorder.isRecording" class="callout">
-         <span v-if="recorder.isPlaying">{{recorder.playbackFrame}}/ </span>{{recorder.frameCount}} frames
+         <span v-if="recorder.isPlaying">{{recorder.playbackIndex}}/ </span>{{recorder.frameCount}} frames
         </div>
       
     </div>

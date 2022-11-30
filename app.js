@@ -38,14 +38,16 @@ window.addEventListener("load", function () {
       
       <div id="controls">
         <div>
+          <select v-model="selectedTaskID">
+             <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
+           </select>
+           
           <button :class="{active:trackFace}" @click="trackFace=!trackFace">😐</button>
           <button :class="{active:trackHands}" @click="trackHands=!trackHands">🖐</button>
         </div>
         
           <div>
-           <select v-model="selectedTaskID">
-             <option v-for="(task, taskID) in allTasks" >{{taskID}} </option>
-           </select>
+           
             <data-recorder :sliderData="sliderData" :labelOptions="task.classifierOptions" />
          </div>
          
