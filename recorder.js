@@ -186,8 +186,8 @@ Vue.component("data-recorder", {
       
     </div>
 
-    <div>
-      <div style="display:flex;flex-direction:row;border:1px solid black">
+    <div style="border:1px solid black">
+      <div style="display:flex;flex-direction:row;">
         <!-- Labels for this data --> 
         <!-- Options or sliders? --> 
 
@@ -216,7 +216,7 @@ Vue.component("data-recorder", {
         
       </div>
       <div class="callout">
-        <span class="label">Current label:</span><span class="value">{{label}}</span>
+        <span class="label">Training label:</span><span class="value">{{label}}</span>
       </div>
     </div>
 

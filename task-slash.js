@@ -41,14 +41,24 @@ ALL_TASKS["slash"] = {
           p.circle(...fingertip, 20)
         })      
         
-         this.osc.freq(...hand.center[1]);
+        let pitch = hand.center[1]
+        console.log("Pitch", pitch)
+         this.osc.freq(pitch);
+        
+       
         
         if (hand.prediction) {
           // Use the label and uncertainty to draw
-          console.log(hand.prediction);
+          // console.log(hand.prediction);
           let pred = hand.prediction;
           p.textSize(pred.certainty ** 2 * 70);
           p.text(pred.label, ...hand.center);
+          
+          
+        //    if (pred.label === "🗡")
+        //    this.osc.start()
+        // if (pred.label === "🛡")
+        //    this.osc.stop()
         }
       }
     });

@@ -45,6 +45,11 @@ window.addEventListener("load", function () {
             <data-recorder :sliderData="sliderData" :labelOptions="task.classifierOptions" />
          </div>
          
+         <div >
+          <span class="label">Predictions:</span>
+          <div >
+          </div>
+      </div>
      
       </div>
 	    <div id="view" ref="view">
@@ -143,6 +148,9 @@ window.addEventListener("load", function () {
                    label: this.task.classifierOptions[index],
                     certainty: rawPrediction[index].value
                 }
+                  
+                  // If the 
+                  
                   // console.log("Predicted hand ", hIndex, prediction.label, prediction.certainty.toFixed(2));
 
                   hands[hIndex].prediction = prediction;
