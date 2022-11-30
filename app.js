@@ -43,12 +43,11 @@ window.addEventListener("load", function () {
           <div>
            
             <data-recorder :sliderData="sliderData" :labelOptions="task.classifierOptions" />
-         </div>
+    
          
-         <div >
-          <span class="label">Predictions:</span>
-          <div >
-          </div>
+       
+          
+          <div style="font-size:14px">{{task.desc}}</div>
       </div>
      
       </div>

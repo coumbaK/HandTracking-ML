@@ -59,18 +59,16 @@ ALL_TASKS["slash"] = {
      //   this.bubblePopSound.play()
     
     //Play a pitch-shifted sound
-       
-     if (newLabel === "👊"){
-      let pitch = (400 - hand.center[1])*.002 + 1
-       this.pianoNote.play()
-    this.pianoNote.rate(pitch)
-     
-       
-       // Random color? 
+
+//      if (newLabel === "👊"){
+//       let pitch = (400 - hand.center[1])*.002 + 1
+//        this.pianoNote.play()
+//     this.pianoNote.rate(pitch)
+    // }
+    
+    // Random color? 
         this.color = [360*Math.random(), 100, 50]
        this.points++
-     }
-    
   
   },
 
