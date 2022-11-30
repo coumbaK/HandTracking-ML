@@ -143,9 +143,9 @@ window.addEventListener("load", function () {
                    label: this.task.classifierOptions[index],
                     certainty: rawPrediction[index].value
                 }
-                  console.log("Predicted hand ", hIndex, prediction.label, prediction.certainty.toFixed(2));
+                  // console.log("Predicted hand ", hIndex, prediction.label, prediction.certainty.toFixed(2));
 
-                  hands[hIndex].label = prediction;
+                  hands[hIndex].prediction = prediction;
                 });
               }
             });

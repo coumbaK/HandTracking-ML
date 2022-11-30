@@ -35,9 +35,19 @@ ALL_TASKS["slash"] = {
       
         // Test drawing
         // hand.points.forEach(pt => p.circle(...pt, 10))
-         hand.points.forEach((pt, index) => p.text(index, ...pt))
+         // hand.points.forEach((pt, index) => p.text(index, ...pt))
         
         p.circle(...hand.center, 20)
+        
+        if (hand.prediction) {
+         
+          console.log(hand.prediction)
+          let pred = hand.prediction
+           p.textSize(pred.certainty**2 *70)
+          p.text(pred.label, ...hand.center)
+        }
+          
+        
       }
     })
   },
