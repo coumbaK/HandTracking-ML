@@ -124,7 +124,7 @@ class Recorder {
     this.isPlaying = true;
   }
 
-  playbackFrame(face, hands) {
+  playbackFrame(hands, face) {
     // Increment counter
     this.playbackIndex = (this.playbackIndex + 1) % this.data.frames.length;
 
@@ -132,10 +132,11 @@ class Recorder {
     let frame = this.data.frames[this.playbackIndex];
 
     // Set the hands and face to this frame
-    if (frame.face) face.fromRecord(frame.face);
+    if (frame.face) face.fromFrame(frame.face);
     if (frame.hands) {
+      console.log(frame.hands, hands)
       frame.hands.forEach((data, handIndex) =>
-        hands[handIndex].fromRecord(data)
+        hands[handIndex].fromFrame(data)
       );
     }
   }

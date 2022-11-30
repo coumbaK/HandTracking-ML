@@ -1,7 +1,9 @@
 let handsfree = undefined;
-function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
+function initHandsFree({ face, hands, p, useHandsFree, onFrame, detectHands, detectFace }) {
   console.log(`HANDSFREE - initialize, hands:${detectHands} face:${detectFace}`);
   let frameCount = 0;
+  
+  
 
   // From the handsfree demos (mostly)
   let handsfree = new Handsfree({
@@ -37,31 +39,33 @@ function initHandsFree({ face, hands, p, onFrame, detectHands, detectFace }) {
       },
     };
 
-    // Set the points to the current mesh
-    if (
-      data.facemesh &&
-      data.facemesh.multiFaceLandmarks &&
-      data.facemesh.multiFaceLandmarks.length > 0
-    ) {
-      let faceMeshData = data.facemesh.multiFaceLandmarks[0];
-      // console.log("update face")
-      // Copy over all of the face data
-      // console.log(faceMeshData)
+    if (useHandsFree()) {
+      // Set the points to the current mesh
+      if (
+        data.facemesh &&
+        data.facemesh.multiFaceLandmarks &&
+        data.facemesh.multiFaceLandmarks.length > 0
+      ) {
+        let faceMeshData = data.facemesh.multiFaceLandmarks[0];
+        // console.log("update face")
+        // Copy over all of the face data
+        // console.log(faceMeshData)
 
-      face.setTo(faceMeshData, settings);
-    }
+        face.setTo(faceMeshData, settings);
+      }
 
-    if (
-      data.hands.multiHandLandmarks &&
-      data.hands.multiHandLandmarks.length > 0
-    ) {
-      // console.log("-- hands -- ", data.hands)
-      hands.forEach((hand, index) => {
-        let handData = data.hands.multiHandLandmarks[index];
-        hand.setTo(handData, settings);
-      });
-    } else {
-      // console.log("-- no hands -- ")
+      if (
+        data.hands.multiHandLandmarks &&
+        data.hands.multiHandLandmarks.length > 0
+      ) {
+        // console.log("-- hands -- ", data.hands)
+        hands.forEach((hand, index) => {
+          let handData = data.hands.multiHandLandmarks[index];
+          hand.setTo(handData, settings);
+        });
+      } else {
+        // console.log("-- no hands -- ")
+      }
     }
 
     onFrame(frameCount);

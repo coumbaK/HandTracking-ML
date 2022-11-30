@@ -44,6 +44,8 @@ window.addEventListener("load", function () {
            
           <button :class="{active:trackFace}" @click="trackFace=!trackFace">😐</button>
           <button :class="{active:trackHands}" @click="trackHands=!trackHands">🖐</button>
+        
+          <button @click="train">
         </div>
         
           <div>
@@ -95,8 +97,11 @@ window.addEventListener("load", function () {
           p.clear();
 
           // Draw stuff
-
+          this.task.draw(p, hands, face)
+            
           // Playback a recording
+          if (RECORDER.isPlaying)
+            RECORDER.playbackFrame(hands, face)
         };
 
         p.mouseClicked = () => {
@@ -119,10 +124,14 @@ window.addEventListener("load", function () {
         p,
         detectHands: this.trackHands,
         detectFace: this.trackFace,
+        useHandsFree() {
+          // Use the HF data if we aren't playing back data
+          return !RECORDER.isPlaying
+        },
         onFrame: (frameCount) => {
           // A frame happened! Record it?
           if (RECORDER.isRecording)
-          RECORDER.recordFrame(face, hands)
+            RECORDER.recordFrame(face, hands)
 
           // Make a precition?
           // console.log(frameCount)

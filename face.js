@@ -64,7 +64,15 @@ class Hand extends Trackable {
     for (var i = 0; i < HAND_LANDMARK_COUNT; i++) {
       this.points[i] = new Vector2D(Math.random() * 400, Math.random() * 300);
     }
+    
+    this.center = new Vector2D()
+    this.fingers = []
+    for (var i = 0; i < 5; i++) {
+      
+    }
   }
+  
+  postSet() {}
 }
 
 /**
