@@ -244,6 +244,9 @@ window.addEventListener("load", function () {
           epochs: this.task.epochCount,
           batchSize: 12,
         };
+        
+        this.nn.compile()
+        
         this.nn.train(trainingOptions, () => {
           console.log("Done training?");
           this.nn.save(() => {
