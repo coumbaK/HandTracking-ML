@@ -64,7 +64,7 @@ ALL_TASKS["slash"] = {
 //       let pitch = (400 - hand.center[1])*.002 + 1
 //        this.pianoNote.play()
 //     this.pianoNote.rate(pitch)
-    // }
+//     }
     
     // Random color? 
         this.color = [360*Math.random(), 100, 50]
