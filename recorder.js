@@ -7,6 +7,9 @@ class Recorder {
     let data = localStorage.getItem("recordings");
     this.recordings = [];
     if (data) this.recordings = JSON.parse(data);
+    
+  
+   
     this.data = undefined
 
   }

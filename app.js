@@ -82,8 +82,7 @@ window.addEventListener("load", function () {
 
         (p.preload = () => {
           // Any preloading
-          for (let id in ALL_TASKS)
-            ALL_TASKS[id].preload?.(p0)
+          for (let id in ALL_TASKS) ALL_TASKS[id].preload?.(p0);
         }),
           (p.setup = () => {
             p.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -159,8 +158,6 @@ window.addEventListener("load", function () {
                       lastLabel
                     );
                   }
-
-                  
                 });
               }
             });
@@ -225,13 +222,20 @@ window.addEventListener("load", function () {
         console.log("NeuralNet - train!");
 
         RECORDER.recordings.forEach((rec) => {
+          let options = this.task.classifierOptions;
+          let index = options.indexOf(rec.label);
+          let oneHotLabel = oneHot(options.length, index);
+
           console.log("Training on label:", rec.label, rec.labelDesc);
           console.log(` ${rec.frames.length} frames`);
           rec.frames.forEach((frame) => {
             // Add each hand in the frame as the input data
             frame.hands.forEach((hand) => {
               const inputs = hand.flat();
-              const outputs = rec.label;
+
+              // Ignore the rec label, recalculate it
+
+              const outputs = oneHotLabel;
 
               this.nn.addData(inputs, outputs);
             });
@@ -244,9 +248,9 @@ window.addEventListener("load", function () {
           epochs: this.task.epochCount,
           batchSize: 12,
         };
-        
-        this.nn.compile()
-        
+
+        this.nn.compile();
+
         this.nn.train(trainingOptions, () => {
           console.log("Done training?");
           this.nn.save(() => {
