@@ -21,6 +21,7 @@ ALL_TASKS["dance"] = {
     // free sound effects: https://freesound.org/
     // Be sure to cite in your .md!
     this.img = p.loadImage("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/sharks.png?v=1670451985918");
+    this.reaction1 = p.loadImage("https://sta.sh/01fgjco73d7e");
     
     this.sharksong = p.loadSound("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/PINKFONG_Baby_Shark_Dance_(thinkNews%20(mp3cut.net).mp3?v=1670454406023");
     
@@ -37,7 +38,7 @@ ALL_TASKS["dance"] = {
     this.color = [100, 100, 80]
     this.points = 10
     
-    this.timestamps= [0.10,0.18, 0.26,0.34,0.42];
+    this.timestamps= [10,18, 26,34,42];
    
     
     
@@ -45,10 +46,21 @@ ALL_TASKS["dance"] = {
   },
   
   onChangeLabel(hand, newLabel, oldLabel) {
-    
-    
+    console.log(this.sharksong.currentTime());
     if (this.sharksong.currentTime() < this.timestamps[0] && newLabel == "🦈"){
-      console.log(this.timestamps[0])
+    console.log("great moves")
+      
+    }
+    if (this.sharksong.currentTime() < this.timestamps[1] && newLabel == "🦈👴🏾"){
+    console.log("great moves")
+      
+    }
+    if (this.sharksong.currentTime() < this.timestamps[2] && newLabel == "🦈👵🏾"){
+    console.log("great moves")
+      
+    }
+    if (this.sharksong.currentTime() < this.timestamps[3] && newLabel == "🌊"){
+    console.log("great moves")
       
     }
     // An event happened!
@@ -90,7 +102,6 @@ ALL_TASKS["dance"] = {
     
   draw(p, hands, face) {
       this.sharksong.play()
-      console.log(this.sharksong.currentTime());
       
       
       p.background(240, 30, 60);
@@ -117,6 +128,7 @@ ALL_TASKS["dance"] = {
         p.vertex(p.width, 0);
         p.endShape();}
         p.image(this.img,p.width/2-250,p.height/2-200);
+        p.image(this.reaction1,p.width/2,p.height/2);
 
     hands.forEach((hand) => {
       // Draw each hand
