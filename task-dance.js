@@ -20,7 +20,7 @@ ALL_TASKS["dance"] = {
     // Any extra asset loading
     // free sound effects: https://freesound.org/
     // Be sure to cite in your .md!
-   
+    this.img = p.loadImage("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/sharks.png?v=1670451985918");
     
     this.swordHitSound = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/536104__eminyildirim__sword-hit-heavy.wav?v=1669823017308');
       this.pianoNote = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/573512__gamedrix974__54.wav?v=1669823019716');
@@ -35,6 +35,7 @@ ALL_TASKS["dance"] = {
     // this.osc.stop()
     this.color = [100, 100, 80]
     this.points = 10
+   
   },
   
   onChangeLabel(hand, newLabel, oldLabel) {
@@ -98,6 +99,7 @@ ALL_TASKS["dance"] = {
         p.vertex(p.width, 0);
         p.vertex(p.width, 0);
         p.endShape();}
+        p.image(this.img,p.width/2-250,p.height/2-200);
 
     hands.forEach((hand) => {
       // Draw each hand
