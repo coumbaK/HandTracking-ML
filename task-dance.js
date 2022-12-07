@@ -24,6 +24,7 @@ ALL_TASKS["dance"] = {
     
     this.sharksong = p.loadSound("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/PINKFONG_Baby_Shark_Dance_(thinkNews%20(mp3cut.net).mp3?v=1670454406023");
     
+  
     
   },
   
@@ -32,19 +33,22 @@ ALL_TASKS["dance"] = {
     this.osc = new p5.Oscillator('sine');
     // this.osc.start()
     // this.osc.stop()
-    
+    this.songtime = 0;
     this.color = [100, 100, 80]
     this.points = 10
+    
+    this.timestamps= [0.10,0.18, 0.26,0.34,0.42];
+   
     
     
    
   },
   
   onChangeLabel(hand, newLabel, oldLabel) {
-   var songtime = this.sharksong.currentTime();
-   this.timestamps= [0.10,0.18, 0.26,0.34,0.42];
-    if (songtime < this.timestamps[0] && newLabel === "🦈"){
-      console.log("wow you got moves!")
+    
+    
+    if (this.sharksong.currentTime() < this.timestamps[0] && newLabel == "🦈"){
+      console.log(this.timestamps[0])
       
     }
     // An event happened!
@@ -86,6 +90,9 @@ ALL_TASKS["dance"] = {
     
   draw(p, hands, face) {
       this.sharksong.play()
+      console.log(this.sharksong.currentTime());
+      
+      
       p.background(240, 30, 60);
 
       p.noStroke();
@@ -152,7 +159,7 @@ ALL_TASKS["dance"] = {
     console.log(songtime);
     p.fill("green");
     p.text(this.points + " points", 350, 250);
-    p.text(songtime, p.width/2-150,p.height/2);
+    
   },
 
   track: "HAND",
