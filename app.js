@@ -42,7 +42,7 @@ window.addEventListener("load", function () {
         
           <div>
            
-            <data-recorder :sliderData="sliderData" :labelOptions="task.classifierOptions" />
+            <data-recorder :sliderData="sliderData" :labelOptions="task.classifierOptions" :taskID="selectedTaskID" />
     
          
        
@@ -66,6 +66,12 @@ window.addEventListener("load", function () {
     },
 
     watch: {
+      task() {
+        localStorage.setItem("lastTask", this.selectedTaskID);
+
+        console.log("TASK CHANGED", localStorage.getItem("lastTask"));
+        this.startTask();
+      },
       recordFace() {
         this.updateHandsfree();
       },
@@ -127,7 +133,8 @@ window.addEventListener("load", function () {
         onFrame: (frameCount) => {
           // A frame happened! Record it?
           if (RECORDER.isRecording) RECORDER.recordFrame(face, hands);
-          else if (frameCount % 10 == 0) {
+          // Or make a prediction
+          else if (frameCount % 10 == 0 && this.nn.hasLoadedModel) {
             // Make a prediction every N frames
 
             hands.forEach((hand, hIndex) => {
@@ -136,27 +143,28 @@ window.addEventListener("load", function () {
               if (handData && hand.isActive) {
                 this.nn.predict(handData, (error, rawPrediction) => {
                   if (error) {
+                    console.warn("--- PREDICTION FAILED ---");
                     console.warn(error);
-                  }
+                  } else {
+                    // Get the argmax
+                    let index = indexOfMax(rawPrediction.map((s) => s.value));
 
-                  // Get the argmax
-                  let index = indexOfMax(rawPrediction.map((s) => s.value));
+                    let prediction = {
+                      output: rawPrediction,
+                      label: this.task.classifierOptions[index],
+                      certainty: rawPrediction[index].value,
+                    };
 
-                  let prediction = {
-                    output: rawPrediction,
-                    label: this.task.classifierOptions[index],
-                    certainty: rawPrediction[index].value,
-                  };
-
-                  // When we change the prediction
-                  let lastLabel = hands[hIndex].prediction?.label;
-                  hands[hIndex].prediction = prediction;
-                  if (lastLabel !== prediction.label) {
-                    this.task.onChangeLabel?.(
-                      hand,
-                      prediction.label,
-                      lastLabel
-                    );
+                    // When we change the prediction
+                    let lastLabel = hands[hIndex].prediction?.label;
+                    hands[hIndex].prediction = prediction;
+                    if (lastLabel !== prediction.label) {
+                      this.task.onChangeLabel?.(
+                        hand,
+                        prediction.label,
+                        lastLabel
+                      );
+                    }
                   }
                 });
               }
@@ -164,36 +172,55 @@ window.addEventListener("load", function () {
           }
         },
       });
-      // this.createModel();
-      // this.loadModel();
-
-      // this.train();
 
       this.startTask();
     },
 
     methods: {
-      startTask() {
-        // Run setup code
-        this.task.setup(p, hands, face);
-
-        let outputLength = this.task.classifierOptions?.length || SLIDER_COUNT;
+      initNeuralNetwork(task) {
+        let outputLength = task.classifierOptions?.length || SLIDER_COUNT;
         let inputLength = HAND_LANDMARK_COUNT * 2;
         console.log(
           `NEURAL NET - Creating a network from ${inputLength} input neurons`
         );
-        console.log(`  to ${outputLength} output neurons`);
+        console.log(` \t\t\t to ${outputLength} output neurons`);
 
-        // Make a new neural net for this task
-        this.nn = ml5.neuralNetwork({
+        const NN_OPTIONS = {
           task: "classification",
           inputs: inputLength,
           outputs: outputLength,
-          outputLabels: this.task.classifierOptions,
+          outputLabels: task.classifierOptions,
+          layers: [
+            {
+              type: "dense",
+              units: 16,
+              activation: "relu",
+            },
+            {
+              type: "dense",
+              units: 16,
+              activation: "sigmoid",
+            },
+            {
+              type: "dense",
+              activation: "sigmoid",
+            },
+          ],
           debug: true,
-        });
+        };
+        console.log(`...options: `, NN_OPTIONS);
+        // Make a new neural net for this task
+        let nn = ml5.neuralNetwork(NN_OPTIONS);
+
         
-        console.log(this.nn.layers)
+        return nn;
+      },
+      startTask() {
+        console.log(
+          `\n---------------------------------------------------------------\nSTART TASK ${this.selectedTaskID}`
+        );
+        // Run setup code
+        this.task.setup(p, hands, face);
 
         //========
         // Attempt to load the model
@@ -201,9 +228,10 @@ window.addEventListener("load", function () {
         console.log(
           " **Don't worry if this 'model.json' fails to load if you haven't created it yet**"
         );
+        this.nn = this.initNeuralNetwork(this.task);
 
         this.nn.load(this.task.modelDetails, () => {
-          console.log("NEURAL NET - Model loaded! Layers:", this.nn.layers);
+          console.log("NEURAL NET - Model loaded!");
           this.nn.hasLoadedModel = true;
         });
       },
@@ -221,53 +249,109 @@ window.addEventListener("load", function () {
       },
 
       train() {
-        console.log("NeuralNet - train!");
-
+        console.log(
+          `\n---------------------------------------------------------------\nTRAIN TASK ${this.selectedTaskID}`
+        );
+        // Reinitialize the neural network
+        this.nn = this.initNeuralNetwork(this.task);
+        console.log("NEURAL NET initialized and ready to train", this.nn);
+        
+         let options = this.task.classifierOptions;
+        let count = 0;
+        let sampleCounts = {}
+        let invalidRecordings = []
         RECORDER.recordings.forEach((rec) => {
-          let options = this.task.classifierOptions;
-          let index = options.indexOf(rec.label);
-          let oneHotLabel = oneHot(options.length, index);
+         
+          let index = options.indexOf(rec.labelDesc);
+          const outputs = oneHot(options.length, index);
+          
 
-          console.log("Training on label:", rec.label, rec.labelDesc);
-          console.log(` ${rec.frames.length} frames`);
-          rec.frames.forEach((frame) => {
-            // Add each hand in the frame as the input data
-            frame.hands.forEach((hand) => {
-              const inputs = hand.flat();
+          if (index < 0) {
+            console.warn(
+              `No class named '${rec.labelDesc}' for task '${this.selectedTaskID}', options ${options}`
+            );
+          invalidRecordings.push(rec)
+          }
+          else {
+            // Add this recording and all its samples
 
-              // Ignore the rec label, recalculate it
+            console.log("- - Training on label:", rec.label, rec.labelDesc);
+            console.log(`     ${rec.frames.length} frames`);
+            rec.frames.forEach((frame) => {
+              // Add each hand in the frame as the input data
+              frame.hands.forEach((hand) => {
+                
+                // Get the hand input
+                const inputs = hand.flat();
 
-              const outputs = oneHotLabel;
 
-              this.nn.addData(inputs, outputs);
+                // Keep track of how many valid samples we have seen
+                count++;
+                if (sampleCounts[rec.labelDesc] === undefined)
+                  sampleCounts[rec.labelDesc] = 0
+                sampleCounts[rec.labelDesc]++
+                
+                this.nn.addData(inputs, outputs);
+                if (count % 50 === 0)
+                  console.log(
+                    `\t\t\tSample #${count}, Input:${JSON.stringify(inputs,  function(key, val) {
+    return val.toFixed ? Number(val.toFixed(3)) : val;
+}).slice(
+                      0,
+                      40
+                    )}, Output: ${outputs}`
+                  );
+              });
+            });
+          }
+        });
+        
+        let missingClasses = options.filter(option => sampleCounts[option] === undefined)
+        console.log(`\tAdded ${count} training samples`);
+        console.log("\t\tValid samples", JSON.stringify(sampleCounts, null, 2))
+        console.log("\t\tSkipped recordings from a different task", invalidRecordings.map(rec => rec.labelDesc))
+        if (count === 0) {
+          console.warn("**** No valid training data, cannot train yet ****");
+        } 
+        
+        else if (missingClasses.length) {
+          console.warn(`**** Missing examples from classes ${missingClasses}, cannot train yet ****`);
+        } 
+        
+        else {
+          this.nn.normalizeData();
+          console.log("NEURAL NET (training) - data added and normalized!");
+
+          // Step 6: train your neural network
+          const trainingOptions = {
+            epochs: this.task.epochCount,
+            batchSize: 12,
+          };
+
+          console.log("NEURAL NET (training)  - layers:", this.nn.layers);
+
+          // Is compiling just not right for ML5?
+          // this.nn.compile()
+          // console.log("NEURAL NET (training)  - compiled!");
+          
+          this.nn.train(trainingOptions, () => {
+            console.log("........Done training!");
+            this.nn.save(() => {
+              console.log("Saving model for ", this.selectedTaskID);
             });
           });
-        });
-        this.nn.normalizeData();
-
-        // Step 6: train your neural network
-        const trainingOptions = {
-          epochs: this.task.epochCount,
-          batchSize: 12,
-        };
-
-        this.nn.compile();
-
-        this.nn.train(trainingOptions, () => {
-          console.log("Done training?");
-          this.nn.save(() => {
-            console.log("Model?");
-          });
-        });
+        }
       },
     },
 
     data() {
+      let startID =
+        localStorage.getItem("lastTask") || Object.keys(ALL_TASKS)[0];
       return {
         sliderData: new Array(SLIDER_COUNT).fill(0.5),
 
         allTasks: ALL_TASKS,
-        selectedTaskID: Object.keys(ALL_TASKS)[0],
+        selectedTaskID: startID,
 
         // Recording
 

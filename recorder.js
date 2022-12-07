@@ -21,25 +21,26 @@ class Recorder {
         return val.toFixed ? Number(val.toFixed(3)) : val;
       return undefined
       });
-    console.log(data)
+    // console.log(data)
     localStorage.setItem("recordings", data);
   }
   // ====================================
   // Recording
 
-  toggleRecording(label, labelDesc) {
+  toggleRecording(label, labelDesc, taskID) {
     if (this.isRecording)
       this.stopRecording()
     else 
-      this.startRecording(label, labelDesc)
+      this.startRecording(label, labelDesc, taskID)
   }
   
-  startRecording(label, labelDesc) {
-    console.log("RECORDER - start recording")
+  startRecording(label, labelDesc, taskID) {
+    console.log(`RECORDER - start recording for Task '${taskID}'`)
     // Begin recording data
     
     
     this.data = {
+      taskID: taskID,
       timestamp: Date.now(),
       frames: [],
       label: label,
@@ -49,7 +50,6 @@ class Recorder {
   }
 
   recordFrame(face, hands) {
-    console.log("RECORDER - record frame")
     // Record a frame of hands and face data
     
     let frame = {};
@@ -76,7 +76,7 @@ class Recorder {
    
     
     this.data.frames.push(frame);
-    console.log("Frame:", this.data.frames.length, this.frameCount)
+    // console.log("Frame:", this.data.frames.length, this.frameCount)
   }
 
   get frameCount() {
@@ -84,9 +84,9 @@ class Recorder {
   }
 
   stopRecording() {
-    console.log("RECORDER - stop recording")
     
     let data = this.data;
+    console.log(`RECORDER - stop recording for Task ${data.taskID}, recorded ${data.frames.length} frames`)
     this.recordings.push(data)
     this.saveRecordings()
     
@@ -137,7 +137,7 @@ class Recorder {
     // Set the hands and face to this frame
     if (frame.face) face.fromFrame(frame.face);
     if (frame.hands) {
-      console.log(frame.hands, hands)
+    
       frame.hands.forEach((data, handIndex) =>
         hands[handIndex].fromFrame(data)
       );
@@ -178,7 +178,7 @@ Vue.component("data-recorder", {
 
           <button  
             :class="{active:recorder.isRecording}" 
-            @click="recorder.toggleRecording(label, labelDesc)">
+            @click="recorder.toggleRecording(label, labelDesc, taskID)">
             ⏺
           </button>
         </div>
@@ -229,7 +229,12 @@ Vue.component("data-recorder", {
 
     </div>`,
 
- 
+ watch: {
+   // Reset the training label when we change tasks
+   labelOptions() {
+     this.selectedOption = this.labelOptions[0]
+   }
+ },
 
   // Events:
   // Every draw frame, advance the playback
@@ -275,5 +280,5 @@ Vue.component("data-recorder", {
     };
   },
 
-  props: ["labelOptions", "sliderData"],
+  props: ["labelOptions", "sliderData", "taskID"],
 });
