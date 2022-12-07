@@ -31,9 +31,10 @@ ALL_TASKS["dance"] = {
     this.osc = new p5.Oscillator('sine');
     // this.osc.start()
     // this.osc.stop()
+    
     this.color = [100, 100, 80]
     this.points = 10
-    this.sharksong.play()
+    
    
   },
   
@@ -55,7 +56,7 @@ ALL_TASKS["dance"] = {
       // Play a sound
       
          
-      
+      //this.sharksong.play()
     
     //Play a pitch-shifted sound
 
@@ -74,6 +75,7 @@ ALL_TASKS["dance"] = {
     
     
   draw(p, hands, face) {
+      
       p.background(240, 30, 60);
 
       p.noStroke();
@@ -134,9 +136,11 @@ ALL_TASKS["dance"] = {
       }
     });
     
+    
     // Show text if you want!
-    p.fill(0)
+    p.fill("green")
     p.text(this.points + " points", 350, 250);
+    p.text("Baby Shark DDU DDU DDU DDU", p.width/2-150,p.height/2);
   },
 
   track: "HAND",
