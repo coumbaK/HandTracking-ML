@@ -192,6 +192,8 @@ window.addEventListener("load", function () {
           outputLabels: this.task.classifierOptions,
           debug: true,
         });
+        
+        console.log(this.nn.layers)
 
         //========
         // Attempt to load the model
@@ -201,7 +203,7 @@ window.addEventListener("load", function () {
         );
 
         this.nn.load(this.task.modelDetails, () => {
-          console.log("NEURAL NET - Model loaded!");
+          console.log("NEURAL NET - Model loaded! Layers:", this.nn.layers);
           this.nn.hasLoadedModel = true;
         });
       },
