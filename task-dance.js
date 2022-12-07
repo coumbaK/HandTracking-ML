@@ -74,10 +74,11 @@ ALL_TASKS["dance"] = {
  
     
     
-  draw(p, hands, face,t) {
+  draw(p, hands, face) {
       p.background(240, 30, 60);
 
       p.noStroke();
+      let t = p.millis()*.001;
 
       for (var j = 0; j < 5; j++) {
         p.fill(170 + j * 10, 70, 40, 0.3);
