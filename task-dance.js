@@ -10,10 +10,10 @@ ALL_TASKS["dance"] = {
   epochCount: 20,
 
   modelDetails: {
-    model: "slash/model.json",
-    metadata: "slash/model_meta.json",
+    model: "dance/model.json",
+    metadata: "dance/model_meta.json",
     weights:
-      "https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/model.weights.bin?v=1669775994921",
+      "https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/model.weights.bin?v=1670445397805",
   },
 
   preload(p) {
