@@ -35,13 +35,18 @@ ALL_TASKS["dance"] = {
     
     this.color = [100, 100, 80]
     this.points = 10
-    this.timestamps= [0.10,0.18];
+    
     
    
   },
   
   onChangeLabel(hand, newLabel, oldLabel) {
-   this.songtime = this.sharksong.currentTime();
+   var songtime = this.sharksong.currentTime();
+   this.timestamps= [0.10,0.18, 0.26,0.34,0.42];
+    if (songtime < this.timestamps[0] && newLabel === "🦈"){
+      console.log("wow you got moves!")
+      
+    }
     // An event happened!
     console.log(`Changed from ${oldLabel} to ${newLabel}` )
     
@@ -61,7 +66,7 @@ ALL_TASKS["dance"] = {
       // Play a sound
       
          
-      this.sharksong.play()
+      
     
     //Play a pitch-shifted sound
 
@@ -80,7 +85,7 @@ ALL_TASKS["dance"] = {
     
     
   draw(p, hands, face) {
-      
+      this.sharksong.play()
       p.background(240, 30, 60);
 
       p.noStroke();
