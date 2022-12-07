@@ -71,9 +71,32 @@ ALL_TASKS["dance"] = {
        this.points++
   
   },
+ 
+    
+    
+  draw(p, hands, face,t) {
+      p.background(240, 30, 60);
 
-  draw(p, hands, face) {
-    p.background(...this.color)   
+      p.noStroke();
+
+      for (var j = 0; j < 5; j++) {
+        p.fill(170 + j * 10, 70, 40, 0.3);
+        p.beginShape();
+        let y = 100;
+        p.vertex(0, 0);
+        p.vertex(0, 0);
+        p.vertex(0, y);
+        // Ripply vertices
+        let waveCount = 10;
+        for (var i = 0; i < waveCount; i++) {
+          let x = (i + 0.5) * (p.width / waveCount);
+          let y2 = y + 100 * p.noise(i, t + j * 10);
+          p.curveVertex(x, y2);
+        }
+        p.vertex(p.width, y);
+        p.vertex(p.width, 0);
+        p.vertex(p.width, 0);
+        p.endShape();}
 
     hands.forEach((hand) => {
       // Draw each hand
