@@ -22,10 +22,8 @@ ALL_TASKS["dance"] = {
     // Be sure to cite in your .md!
     this.img = p.loadImage("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/sharks.png?v=1670451985918");
     
-    this.swordHitSound = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/536104__eminyildirim__sword-hit-heavy.wav?v=1669823017308');
-      this.pianoNote = p.loadSound('https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/573512__gamedrix974__54.wav?v=1669823019716');
-      this.bubblePopSound = p.loadSound(' https://cdn.glitch.global/9df71f81-684c-4eec-b6fd-e1074f6828b8/376968__elmasmalo1__bubble-pop.wav?v=1669823025748');
-   
+    this.sharksong = p.loadSound("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/iringtones.net_baby-shark.mp3?v=1670452872565");
+    
   },
   
   setup(p) {
@@ -35,6 +33,7 @@ ALL_TASKS["dance"] = {
     // this.osc.stop()
     this.color = [100, 100, 80]
     this.points = 10
+    this.sharksong.play()
    
   },
   
@@ -54,10 +53,9 @@ ALL_TASKS["dance"] = {
         //    this.osc.stop()
       
       // Play a sound
-     //  if (newLabel === "🗡")
-     //    this.swordHitSound.play()
-     // else 
-     //   this.bubblePopSound.play()
+      
+         
+      
     
     //Play a pitch-shifted sound
 
