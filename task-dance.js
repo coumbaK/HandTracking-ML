@@ -24,6 +24,7 @@ ALL_TASKS["dance"] = {
     
     this.sharksong = p.loadSound("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/PINKFONG_Baby_Shark_Dance_(thinkNews%20(mp3cut.net).mp3?v=1670454406023");
     
+    
   },
   
   setup(p) {
@@ -34,12 +35,13 @@ ALL_TASKS["dance"] = {
     
     this.color = [100, 100, 80]
     this.points = 10
+    this.timestamps= [0.10,0.18];
     
    
   },
   
   onChangeLabel(hand, newLabel, oldLabel) {
-   
+   this.songtime = this.sharksong.currentTime();
     // An event happened!
     console.log(`Changed from ${oldLabel} to ${newLabel}` )
     
@@ -48,8 +50,10 @@ ALL_TASKS["dance"] = {
     // change some value....
     
       // Make a theremin!
+    //this.sharksong.play()
            if (newLabel === "🦈")
-           {this.sharksong.play()
+           {
+             
            } 
          
             
@@ -139,7 +143,7 @@ ALL_TASKS["dance"] = {
     
     
     // Show text if you want!
-    var songtime = this.sharksong.currentTime();
+    
     console.log(songtime);
     p.fill("green");
     p.text(this.points + " points", 350, 250);
