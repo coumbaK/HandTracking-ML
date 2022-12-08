@@ -126,6 +126,7 @@ ALL_TASKS["dance"] = {
         
 
     hands.forEach((hand) => {
+      p.stroke('white');
       // Draw each hand
       if (hand.isActive) {
         // Test drawing

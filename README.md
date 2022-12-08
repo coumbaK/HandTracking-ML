@@ -25,27 +25,25 @@ I trained multiple times because my loss value was either infinite or too high t
 
 
 ## Which gestures did it guess wrong and when? What could have improved that training data?
- 
+ mommy shark gestures and the wave gesture were mixed up a lot because the palm of the hands both show in these movements.
 
 
 ## How long did it take to train the network with the Teachable Machine pixel-based approach?
-
---your answer here--
+it took approximately 1 min
 
 
 
 ## How did the quality of predictions compare between them?
 
---your answer here--
+-- teachable machine consistently got one gesture wrong that my machine didn't.
 
 
 ## How did the quality of predictions on Teachable Machine change when you changed the background or lighting?
-
---your answer here--
+accuracy got higher.
 
 ## List any resources (code, images, etc) you've used, and where you got them from
 
---your answer here--
+reused code from Dr Kate Parametric assignment for background
 
 ## List any help you got from classmates or websites, so that you can remember it for later
 
