@@ -21,7 +21,7 @@ ALL_TASKS["dance"] = {
     // free sound effects: https://freesound.org/
     // Be sure to cite in your .md!
     this.img = p.loadImage("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/sharks.png?v=1670451985918");
-    this.reaction1 = p.loadImage("https://sta.sh/01fgjco73d7e");
+    this.reaction1 = p.loadImage("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/dedtvm6-c376a50c-4cbd-4eb5-855e-2424e39762a4.png?v=1670457595094");
     
     this.sharksong = p.loadSound("https://cdn.glitch.global/94c4b6a1-03c7-41bb-b579-aa6780e9a47d/PINKFONG_Baby_Shark_Dance_(thinkNews%20(mp3cut.net).mp3?v=1670454406023");
     
@@ -48,7 +48,7 @@ ALL_TASKS["dance"] = {
   onChangeLabel(hand, newLabel, oldLabel) {
     console.log(this.sharksong.currentTime());
     if (this.sharksong.currentTime() < this.timestamps[0] && newLabel == "🦈"){
-    console.log("great moves")
+        p.image(this.reaction1,p.width/2-500,p.height/2-400);
       
     }
     if (this.sharksong.currentTime() < this.timestamps[1] && newLabel == "🦈👴🏾"){
@@ -72,12 +72,7 @@ ALL_TASKS["dance"] = {
     
       // Make a theremin!
     //this.sharksong.play()
-           if (newLabel === "🦈")
-           {
-             
-           } 
-         
-            
+           
   
       // Play a sound
       
@@ -128,7 +123,7 @@ ALL_TASKS["dance"] = {
         p.vertex(p.width, 0);
         p.endShape();}
         p.image(this.img,p.width/2-250,p.height/2-200);
-        p.image(this.reaction1,p.width/2,p.height/2);
+        
 
     hands.forEach((hand) => {
       // Draw each hand
@@ -168,7 +163,7 @@ ALL_TASKS["dance"] = {
     
     // Show text if you want!
     
-    console.log(songtime);
+    
     p.fill("green");
     p.text(this.points + " points", 350, 250);
     
