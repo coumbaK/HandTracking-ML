@@ -8,7 +8,7 @@ Mame Coumba KA
 
 
 ## Describe the experience you designed
-I wanted to create something similar to Just Dance using the song Baby Shark and dance gestures.
+I wanted to create something similar to Just Dance using the song Baby Shark and dance gestures. I use a background with water and waves as well as image of sharks and my hands drawing look like bubble.
 
 ## For each hand gesture it responds to, what does it do?
 My initial idea was to compare every gesture with the right move according to the song and choreography then similar to Just Dance give feedback to the use on how they are doing. I wasn't able to entirely implment this so my code checks that the hand tracking recognizes the right label at the right part of the song which means the user is doing the right move.
